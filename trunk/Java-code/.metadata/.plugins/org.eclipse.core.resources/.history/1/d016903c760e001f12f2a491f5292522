@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+
+<struts-config> 
+  <data-sources />
+  
+  <form-beans>
+  	<form-bean name="scanForm" type="com.abc.scan.form.ScanForm"/>
+  	<form-bean name="fileForm" type="com.abc.scan.form.FileForm"/>
+  	<form-bean name="treeForm" type="com.abc.scan.form.TreeForm"/>
+  	<form-bean name="opForm"   type="com.abc.scan.form.OpForm"  />
+  </form-beans>
+  
+  <global-exceptions />
+  
+  <global-forwards/>
+
+  <action-mappings >
+    <action path="/changePage" type="com.abc.scan.action.ScanAction" name="scanForm" scope="request" validate="false" input="/index.jsp">
+    	<forward name="main" path="/scanList.jsp"/>
+    	<forward name="unload" path="/error/unload.jsp"/>
+    	<forward name="error" path="/error/error.jsp"/>
+    </action>
+    
+    <action path="/fileDisplay" type="com.abc.scan.action.FileAction" name="fileForm" scope="request" validate="false" input="/scanList.jsp">
+    	<forward name="MediaPlayer" path="/display/MediaPlayer.jsp"/>
+    	<forward name="RealPlayer" path="/display/RealPlayer.jsp"/>
+    	<forward name="Picture" path="/display/Picture.jsp"/>
+    	<forward name="error" path="/error/error.jsp"/>
+    </action>
+    
+    <action path="/loadTree" type="com.abc.scan.action.TreeAction" name="treeForm" scope="request" validate="false" input="/tree.jsp">
+    	<forward name="tree" path="/tree.jsp"/>
+    	<forward name="error" path="/error/error.jsp"/>
+    </action>
+    
+    <action path="/doOp" type="com.abc.scan.action.OpAction" name="opForm" scope="request" validate="false" input="/tree.jsp">
+    	<forward name="down" path="/scan_download.jsp"/>
+    </action>
+  </action-mappings>
+
+  <message-resources parameter="com.abc.struts.ApplicationResources" />
+</struts-config>
+

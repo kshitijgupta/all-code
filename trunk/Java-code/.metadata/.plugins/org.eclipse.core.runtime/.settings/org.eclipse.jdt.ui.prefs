@@ -1,0 +1,39 @@
+#Mon Feb 01 01:45:02 HKT 2010
+content_assist_proposals_foreground=26,26,26
+org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+content_assist_proposals_background=255,255,255
+spelling_ignore_digits=true
+useQuickDiffPrefPage=true
+spelling_ignore_upper=true
+org.eclipse.jdt.ui.overrideannotation=true
+content_assist_number_of_computers=15
+useAnnotationsPrefPage=true
+spelling_ignore_single_letters=true
+org.eclipse.jdt.ui.staticondemandthreshold=99
+spelling_ignore_urls=true
+spelling_locale_initialized=true
+fontPropagated=true
+org.eclipse.jdt.ui.exception.name=e
+org.eclipse.jdt.ui.editor.tab.width=
+org.eclipse.jdt.ui.text.code_templates_migrated=true
+org.eclipse.jdt.ui.text.templates_migrated=true
+spelling_locale=zh_CN
+org.eclipse.jdt.ui.gettersetter.use.is=true
+org.eclipse.jdt.ui.importorder=java;javax;org;com;
+org.eclipse.jface.textfont=1|Monospace|10.0|0|GTK|1|;
+spelling_ignore_non_letters=true
+tabWidthPropagated=true
+spelling_ignore_java_strings=true
+outlinesortoption=T,SF,SI,SM,F,I,C,M,
+spelling_ignore_mixed=true
+org.eclipse.jdt.ui.javadoclocations.migrated=true
+eclipse.preferences.version=1
+org.eclipse.jdt.ui.formatterprofiles.version=11
+org.eclipse.jdt.ui.ondemandthreshold=99
+proposalOrderMigrated=true
+org.eclipse.jdt.ui.text.custom_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+spelling_ignore_ampersand_in_properties=true
+spelling_user_dictionary_encoding=
+spelling_ignore_sentence=true
+org.eclipse.jdt.ui.ignorelowercasenames=true
+org.eclipse.jdt.ui.visibility.order=B,V,R,D,
