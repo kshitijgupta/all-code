@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<script src="judgeBrowser.js" language="javascript"></script>
+<title>ABC-多媒体</title>
+<style type="text/css">
+<!--
+strong{
+	cursor:pointer;
+}
+
+td.topClick{
+	color:#003366;
+	font-size:14px;
+	background-color:#0000FF;
+	filter:progid:DXImageTransform.Microsoft.Gradient(startColorStr=#FFFFFF, endColorStr=#BED9EB, gradientType=0);
+	/*background-image:url(img/bg_b_120_35.bmp);
+	background-repeat:no-repeat;*/
+}
+
+td.topOut{
+	color:#003366;
+	font-size:14px;
+}
+
+.logoABC {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-weight: bold;
+}
+
+-->
+</style>
+</head>
+<body>
+<SCRIPT language="javascript">
+<!--
+	var isDrag = false;
+	window.document.body.onselectstart=new Function("return false");
+	
+	function topClick(id, url){
+		var sum = 5;
+		for(var i=1; i<=sum; i++){
+			document.getElementById('top'+i).className = "topOut";
+		}
+		document.getElementById('top'+id).className = "topClick";
+		if(id=="1"){window.frames['page'].window.location = "./file_main.html";};
+		if(id=="2"){window.frames['page'].window.location = "./file_movie_1.html";};
+		if(id=="3"){window.frames['page'].window.location = "./file_music_1.html";};
+		if(id=="4"){window.frames['page'].window.location = "./file_pic_1.html";};
+		if(id=="5"){window.frames['page'].window.location = "./file_other_1.html";};	
+	}
+	
+	function inA(obj){
+		obj.style.color = "#6666CC";
+	}
+	
+	function outA(obj){
+		obj.style.color = "#003366";
+	}
+	
+-->	
+</SCRIPT>
+
+<div style="position:absolute; left:0px; top: 75px; z-index:100;"><!--<img name="" src="./img/bg_b_120_35.bmp" width="120" height="35" alt="" /> -->
+	<table align="center">
+		<tr>
+			<td valign="top" id="top1" width="120px" height="30px" align="center" class="topClick">
+				<a onClick=" topClick(1, '');" onMouseOver="inA(this);" onMouseOut="outA(this)"><strong>首页</strong></a></td>
+			<td valign="top" id="top2" width="125px" height="30px" align="center" class="topOut">
+				<a onClick=" topClick(2, '');" onMouseOver="inA(this);" onMouseOut="outA(this)"><strong>视频</strong></a></td>
+			<td valign="top" id="top3" width="125px" height="30px" align="center" class="topOut">
+				<a onClick=" topClick(3, '');" onMouseOver="inA(this);" onMouseOut="outA(this)"><strong>音乐</strong></a></td>
+			<td valign="top" id="top4" width="125px" height="30px" align="center" class="topOut">
+				<a onClick=" topClick(4, '');" onMouseOver="inA(this);" onMouseOut="outA(this)"><strong>图片</strong></a></td>
+			<td valign="top" id="top5" width="125px" height="30px" align="center" class="topOut">
+				<a onClick=" topClick(5, '');" onMouseOver="inA(this);" onMouseOut="outA(this)"><strong>其他</strong></a></td>
+		</tr>
+	</table>
+</div>
+<div style="position:absolute; left:0px; top:0px; z-index:-1;">
+
+<div id="drag_div" style=" width:270px; height:25px; cursor:pointer; position:absolute; left:0px; top:0px;z-index:10000; visibility:hidden;">
+	<table width="95%"  border="0" cellpadding="0" cellspacing="0" style="position:absolute; top:0px; left:0px; z-index:100;">
+		<tr>
+			<td height="23px" width="15%" style="background-color:#FFCCCC; border-right:1px solid #FFFFFF"><div id="drag_state" style='font-size:12px;'><a style='color:red;'>&nbsp;&nbsp;no</a></div></td>
+			<td height="23px" width="85%" style="background-color:#BED9EB;"><div id="drag_info" style='font-size:12px;'></div></td>
+		</tr>
+	</table>
+	<table width="95%" height="23px" border="0" cellpadding="0" cellspacing="0" style="position:absolute; top:2px; left:2px; z-index:50;">
+		<tr>
+			<td height="100%" width="100%" style="background-color:#666666"></td>
+		</tr>
+	</table>
+</div>
+
+<table width="100%" border="1" cellpadding="0" cellspacing="0" style="border-bottom:1px solid #BED9EB;border-right:1px solid #BED9EB;border-top:1px solid #BED9EB;border-left:1px solid #BED9EB;">
+  <tr>
+    <td colspan="2" width="100%"  style="border-bottom:1px solid #BED9EB;">
+		<table width="100%" style=" background-color:#0000FF; filter:progid:DXImageTransform.Microsoft.Gradient(startColorStr=#FFFFFF, endColorStr=#BED9EB, gradientType=0);">
+		<tr>
+			<td height="50px">
+				<table>
+					<tr>
+						<td>
+							<div>
+								<span class="logoABC" style="font-size:36px; color:#990000">ABC</span>
+								<!--<img name="logo" width="60" height="50" alt="" src="img/logo.png" /> -->
+							</div>
+						</td>
+						<td valign="top">
+							<span style="font-size:12px;">多媒体浏览工具</span>
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td align="right" valign="bottom" height="50">
+				<div style="font-size:13px;">
+				<table>
+					<tr>
+						<td>
+							<input type="text" size="35" maxlength="30" />
+						</td>
+						<td>
+							<input name="偷窥一眼" type="button" id="偷窥一眼" value="偷窥一眼" />
+						</td>
+						<td>
+							<table border="0" cellpadding="0" cellspacing="0">
+								<tr>
+									<td>
+										<span style="font-size:12px" onclick="window.frames['page'].window.location = './model/gaojisousuo.htm';" style="cursor:pointer">高级</span>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span style="font-size:12px">帮助</span>
+									</td>
+								</tr>
+						  </table>
+						</td>
+						<td>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						</td>
+					</tr>
+				</table>
+				</div>			
+			</td>
+		</tr>
+		</table>
+	</td>
+  </tr>
+  <tr>
+    <td colspan="2" height="50px" style="border-bottom:1px solid #0099FF;">
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+			<tr>
+				<td  height="45px" align="right" valign="bottom" style="font-size:12px;">
+					<a onClick="window.frames['page'].window.location = './b/superManager.jsp';">管理</a><a onClick="window.frames['page'].window.location = './tongji/tongji.html';">|统计</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td width="100%" height="5px" style=" background-color:#0000FF; filter:progid:DXImageTransform.Microsoft.Gradient(startColorStr=#FFFFFF, endColorStr=#BED9EB, gradientType=0)">
+			  </td>
+			</tr>
+		</table>
+	</td>
+  </tr>
+  <tr id="frame_tr">
+  	<td height="800px" width="20%" style="border-right: thin solid #BED9EB">
+		<iframe allowtransparency="true" scrolling="yes" width="100%" height="800px" frameborder=0 scrolling=auto src="tree.html"></iframe>
+	</td>
+    <td height="600px" width="80%">
+		<!--<iframe allowtransparency="true" width="100%" height="800px" frameborder=0 scrolling=auto src="file.html"></iframe> -->
+		<iframe id="page" allowtransparency="true" width="100%" height="800px" frameborder=0 scrolling=auto src="./file_main.html"></iframe>
+	</td>
+  </tr>
+  <tr>
+    <td colspan="2" width="100%" style=" background-color:#0000FF; filter:progid:DXImageTransform.Microsoft.Gradient(startColorStr=#FFFFFF, endColorStr=#BED9EB, gradientType=0)">&nbsp;</td>
+  </tr>
+</table>
+</div>
+
+</body>
+</html>

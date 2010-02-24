@@ -1,0 +1,22 @@
+strong{
+	cursor:pointer;
+}
+
+td.topClick{
+	color:#003366;
+	font-size:14px;
+	background-color:#0000FF;
+	filter:progid:DXImageTransform.Microsoft.Gradient(startColorStr=#FFFFFF, endColorStr=#BED9EB, gradientType=0);
+	/*background-image:url(img/bg_b_120_35.bmp);
+	background-repeat:no-repeat;*/
+}
+
+td.topOut{
+	color:#003366;
+	font-size:14px;
+}
+
+.logoABC {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-weight: bold;
+}
