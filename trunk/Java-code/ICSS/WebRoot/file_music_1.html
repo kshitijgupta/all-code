@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>资源视图</title>
+</head>
+<body style="BACKGROUND-COLOR: transparent;">
+<div style="position:absolute; left:0px; top:0px; width:100%; z-index:500;">
+<table width="100%">
+	<tr>
+		<td>
+			<table style="font-size:12px; position:absolute; left:0px; top:0px;z-index:500;">
+				<tr>
+					<td align="center"><input name="" type="button" value="&nbsp;&nbsp;删除&nbsp;&nbsp;"/></td>
+					<td align="center"><input name="" type="button" value="&nbsp;&nbsp;修改&nbsp;&nbsp;"/></td>
+					<td align="center"><input name="" type="button" value="&nbsp;&nbsp;移动&nbsp;&nbsp;"/></td>
+					<td align="center"><input name="" type="button" value="&nbsp;&nbsp;上传&nbsp;&nbsp;"/></td>
+					<td align="center"><input name="" type="button" value="&nbsp;&nbsp;增加&nbsp;&nbsp;"/></td>
+					<td align="center"><input name="" type="button" value="&nbsp;&nbsp;下载&nbsp;&nbsp;"/></td>
+				</tr>
+			</table>
+		</td>
+		<td align="right">
+			<input name="" type="button" onclick="window.location.href='./file_music_2.html';" value="&nbsp;&nbsp;切换视图&nbsp;&nbsp;"/>
+		</td>
+	</tr>
+</table>
+</div>
+<div style="position:absolute; left:0px; top:35px; width:100%; z-index:500; font-size:12px; color:green;"><strong>&nbsp;&nbsp;&nbsp;&nbsp;音乐列表&nbsp;&nbsp;(请在标题上拖动)</strong></div>
+<div style="position:absolute; left:0px; top:50px;z-index:1000; width:100%">
+	<table width="100%" border="0" style="color:#000000; font-size:13px; position:absolute; left:0px; top:0px; width:100%; z-index:500;">
+		<tr>
+			<td align="left" width="2%" height="25px">&nbsp;</td>
+			<td align="left" width="5%" height="25px"><strong>类目</strong></td>
+			<td align="left" width="20%" height="25px"><strong>标题</strong></td>
+			<td align="left" width="15%" height="25px"><strong>级别</strong></td>
+			<td align="left" width="20%" height="25px"><strong>描述</strong></td>
+			<td align="left" width="10%" height="25px"><strong>编著</strong></td>
+			<td align="left" width="10%" height="25px"><strong>来源</strong></td>
+			<td align="left" width="10%" height="25px"><strong>时间</strong></td>
+			<td align="left" width="4%" height="25px"><strong>预览</strong></td>
+			<td align="left" width="4%" height="25px"><strong>操作</strong></td>
+		</tr>
+		<tr>
+			<td align="left"><input name="" type="checkbox" value="" /></td>
+			<td align="left">音乐</td>
+			<td align="left"><a id="1" onclick="" onmousedown="judgeDown();">《拖拖拖》</a></td>
+			<td align="left">******</td>
+			<td align="left">这是描述</td>
+			<td align="left">这是作者</td>
+			<td align="left">这是来源</td>
+			<td align="left">2008年9月7日</td>
+			<td align="left"><input name="" type="button" value="试听"/></td>
+			<td align="left"><input name="" type="button" value="下载"/></td>
+		</tr>
+		<tr>
+			<td colspan="10" width="90%" height="1px" style=" background-color:#999999"></td>
+		<tr>
+	</table>
+</div>
+<script language="javascript">
+<!--
+	window.document.body.onselectstart=new Function("return false");
+	
+	var px = 250;
+	var py = 115;
+	
+	var text = document.getElementById('text');
+	var drag_div = parent.document.getElementById('drag_div');
+	
+	function resetDiv(){
+		parent.isDrag = false;
+	
+		drag_div.style.visibility = "hidden";
+		drag_div.style.left = 0;
+		drag_div.style.top = 0;
+	}
+	
+	function dragDiv(){
+		if(parent.isDrag == true){
+			drag_div.style.visibility = "visible";
+			//document.getElementById('count').innerHTML=window.event.clientX+"####"+event.y+"------"+parent.isDrag;
+			
+			drag_div.style.left = event.x + px;
+			drag_div.style.top = event.y + py;
+		}	
+	}
+	
+	function stopDiv(){
+		parent.isDrag = false;
+		//document.getElementById('count').innerHTML=window.event.clientX+"####"+event.y+"------"+parent.isDrag;
+		resetDiv();
+		document.onmousemove= null;
+		document.onmouseup= null;
+	}
+	
+	function doDiv(id, name){
+		parent.isDrag = true;
+		
+		document.onmouseup= function(){stopDiv()};
+		document.onmousemove= function(){dragDiv()};
+	}
+	
+	function judgeDragDiv(){
+		if(parent.isDrag == false){
+			resetDiv();
+			document.onmouseup= null;
+			document.onmousemove= null;
+		}
+	}
+	
+	function judgeDown(id, name){
+		if(parent.isDrag == false){
+			doDiv(id, name);
+		}
+	}
+	
+	document.onmouseover= function(){judgeDragDiv()};
+	//text.onmousedown = function(){judgeDown()};
+-->
+</script>
+</body>
+</html>
