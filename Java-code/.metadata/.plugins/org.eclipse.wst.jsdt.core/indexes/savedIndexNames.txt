@@ -1,0 +1,16 @@
+INDEX VERSION 1.121+/home/luolei/Workspaces/MyEclipse 8.x/.metadata/.plugins/org.eclipse.wst.jsdt.core/indexes
+3515514403.index
+649336079.index
+2117774861.index
+338145258.index
+4050585440.index
+1861377029.index
+2149571798.index
+3247941466.index
+1924484980.index
+1220476073.index
+1921475903.index
+871769892.index
+2801608237.index
+1920178014.index
+474443748.index
