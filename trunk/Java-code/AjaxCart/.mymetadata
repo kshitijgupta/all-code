@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="AjaxCart"
+  id="myeclipse.1264945501222"
+  context-root="/AjaxCart"
+  j2ee-spec="5.0"
+  archive="AjaxCart.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+
