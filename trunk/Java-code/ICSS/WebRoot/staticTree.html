@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>menuset</title>
+<style type='text/css'>
+body{
+	background:#ffffff;
+}
+a{
+	color:#000000;
+	text-decoration:none;
+}
+</style>
+</head>
+<body>
+<script language='JavaScript' src='menutree/menutree.js'></script>
+
+<script language="JavaScript">
+
+
+
+addtree('<B>科研管理维护</B>');
+
+addtree('-向项目申请管理','verticalproject.jsp?method=io');
+addtree('-项目信息管理');
+addtree('--项目立项管理','project_setup_welcome.jsp');
+addtree('-获奖项目');
+addtree('--添加','awardproject_insert.jsp');
+addtree('--查询','awardproject_query.jsp');
+addtree('--审批','awardproject_check.jsp');
+addtree('--修改/删除','awardproject_display.jsp');
+
+addtree('-结题管理');
+addtree('--签定/验收管理');
+addtree('---添加','certificate_insert.jsp');
+addtree('---查询','endtype_query.jsp');
+addtree('---修改/删除','endtype_modiquery.jsp');
+addtree('--到期项目提醒','project_query.jsp');
+addtree('--审核','endtype_power.do');
+addtree('-*科研经费管理');
+addtree('--添加','scientificfund_insert.jsp');
+addtree('--查询','scientificfund_query.jsp');
+addtree('--修改/删除','scientificfund_modify.do');
+addtree('-管理');
+addtree('--改/删除');
+addtree('---查询');
+addtree('----查询','endtype_query.jsp');
+createtree();
+</script>
+</body>
+</html>
