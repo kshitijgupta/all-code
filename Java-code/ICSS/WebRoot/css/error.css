@@ -1,0 +1,93 @@
+.area {
+	CLEAR: both; MARGIN: 0px auto; OVERFLOW: auto; WIDTH: 750px
+}
+.area .col1 {
+	FLOAT: left; WIDTH: 501px
+}
+.area .col2 {
+	FLOAT: right; WIDTH: 240px
+}
+.area .rightBox {
+	CLEAR: both; BORDER-RIGHT: #ccc 1px solid; BORDER-TOP: #ccc 1px solid; BACKGROUND: #f2f6fb; OVERFLOW: auto; BORDER-LEFT: #ccc 1px solid; BORDER-BOTTOM: #ccc 1px solid
+}
+.area .leftBox {
+	CLEAR: both; BORDER-RIGHT: #ccc 1px solid; BORDER-TOP: #ccc 1px solid; OVERFLOW: auto; BORDER-LEFT: #ccc 1px solid; BORDER-BOTTOM: #ccc 1px solid
+}
+.leftT {
+	CLEAR: both
+}
+.leftT H2 {
+	CLEAR: both; PADDING-RIGHT: 0px; PADDING-LEFT: 25px; FONT-WEIGHT: bold; FONT-SIZE: 14px; PADDING-BOTTOM: 0px; COLOR: #1f3a87; PADDING-TOP: 25px; TEXT-ALIGN: left
+}
+.leftText {
+	CLEAR: both; PADDING-RIGHT: 0px; PADDING-LEFT: 25px; PADDING-BOTTOM: 25px; PADDING-TOP: 0px; TEXT-ALIGN: left
+}
+.leftText DL {
+	CLEAR: both
+}
+.leftText DT {
+	CLEAR: both; PADDING-RIGHT: 0px; PADDING-LEFT: 20px; FONT-SIZE: 14px; BACKGROUND: url(/img/dot3.gif) no-repeat 0px 18px; PADDING-BOTTOM: 0px; COLOR: #bc2931; PADDING-TOP: 18px
+}
+.leftText DD {
+	CLEAR: both; PADDING-RIGHT: 0px; PADDING-LEFT: 20px; PADDING-BOTTOM: 0px; LINE-HEIGHT: 20px; PADDING-TOP: 3px
+}
+.leftText .uLine {
+	TEXT-DECORATION: underline
+}
+.rightT {
+	CLEAR: both; MARGIN: 0px auto; WIDTH: 220px; BORDER-BOTTOM: #ccc 1px solid; HEIGHT: 30px
+}
+.rightT H2 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-WEIGHT: bold; FONT-SIZE: 14px; PADDING-BOTTOM: 0px; COLOR: #333; PADDING-TOP: 9px; TEXT-ALIGN: left
+}
+.rightT1 {
+	CLEAR: both; BORDER-TOP: #ccc 1px solid; MARGIN: 0px auto; WIDTH: 220px; TEXT-ALIGN: left
+}
+.rightT1 H2 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-SIZE: 14px; PADDING-BOTTOM: 0px; COLOR: #bc2931; PADDING-TOP: 15px
+}
+.rightLogin {
+	CLEAR: both; PADDING-RIGHT: 0px; PADDING-LEFT: 20px; PADDING-BOTTOM: 0px; COLOR: #1f3a87; PADDING-TOP: 9px; TEXT-ALIGN: left
+}
+.rightLogin H3 {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; COLOR: #bc2931
+}
+.rightLogin LI {
+	LINE-HEIGHT: 30px
+}
+.rightLogin .s1 {
+	FONT-SIZE: 14px
+}
+.rightLogin .s1 INPUT {
+	BORDER-RIGHT: #7f9db9 1px solid; BORDER-TOP: #7f9db9 1px solid; FONT-SIZE: 12px; BORDER-LEFT: #7f9db9 1px solid; WIDTH: 160px; BORDER-BOTTOM: #7f9db9 1px solid; HEIGHT: 16px
+}
+.rightLogin .s2 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 5px; PADDING-BOTTOM: 0px; PADDING-TOP: 1px
+}
+.rightLogin .s2 INPUT {
+	MARGIN-BOTTOM: -2px
+}
+.rightLogin .s3 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 18px; PADDING-BOTTOM: 6px; PADDING-TOP: 10px
+}
+.rightLogin .s3 INPUT {
+	BORDER-RIGHT: #1f3a87 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #1f3a87 1px solid; PADDING-LEFT: 0px; FONT-SIZE: 14px; BACKGROUND: url(/img/bg1.gif) repeat-x; PADDING-BOTTOM: 0px; BORDER-LEFT: #1f3a87 1px solid; WIDTH: 138px; CURSOR: pointer; COLOR: #1f3a87; PADDING-TOP: 2px; BORDER-BOTTOM: #1f3a87 1px solid; HEIGHT: 23px
+}
+.rightLogin .s4 {
+	PADDING-RIGHT: 15px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; TEXT-ALIGN: right
+}
+.rightLogin .s5 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 18px; PADDING-BOTTOM: 0px; PADDING-TOP: 1px
+}
+.rightLogin .s5 INPUT {
+	BORDER-RIGHT: #1f3a87 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #1f3a87 1px solid; PADDING-LEFT: 0px; FONT-SIZE: 14px; BACKGROUND: url(/img/bg1.gif) repeat-x; PADDING-BOTTOM: 0px; BORDER-LEFT: #1f3a87 1px solid; WIDTH: 138px; CURSOR: pointer; COLOR: #1f3a87; PADDING-TOP: 2px; BORDER-BOTTOM: #1f3a87 1px solid; HEIGHT: 23px
+}
+.rightList {
+	CLEAR: both; PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 9px; PADDING-TOP: 9px
+}
+.rightList LI {
+	CLEAR: both; PADDING-RIGHT: 0px; PADDING-LEFT: 21px; BACKGROUND: url(/img/dot1.gif) no-repeat 13px 7px; PADDING-BOTTOM: 0px; LINE-HEIGHT: 20px; PADDING-TOP: 0px; TEXT-ALIGN: left
+}
+.rightList .s6 {
+	PADDING-RIGHT: 15px; PADDING-LEFT: 9px; BACKGROUND: none transparent scroll repeat 0% 0%; PADDING-BOTTOM: 5px; PADDING-TOP: 5px; TEXT-ALIGN: center
+}

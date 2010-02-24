@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" /> 
+<style>
+body{
+	font-size:13px;
+	color:#333333;
+	background-color:#BED9EB; /*background-color:transparent;*/
+}
+td.close{
+	background-image:url(img/folder.gif); 
+	background-repeat:no-repeat
+}
+
+td.open{
+	background-image:url(img/folderopen.gif); 
+	background-repeat:no-repeat
+}
+
+div.over{
+	background-color:#6699CC;
+	cursor:pointer;
+}
+
+div.out{
+	cursor:pointer;
+}
+
+div.nosee{
+	display:none;
+}
+
+div.see{
+	display:block;
+}
+
+div.main{
+	height:25px;
+	background-color:#0000FF; 
+	filter:progid:DXImageTransform.Microsoft.Gradient(startColorStr=#6699FF, endColorStr=#BED9EB, gradientType=1);
+}
+
+div.frame{
+	cursor:pointer;
+	border-top:1px solid #CCCCCC;
+}
+
+</style>
+<title>目录视图</title>
+</head>
+<body>
+<script language="javascript">
+<!--
+	var drag_state = parent.document.getElementById('drag_state');
+	var drag_info = parent.document.getElementById('drag_info');
+	var drag_div = parent.document.getElementById('drag_div');
+	
+	var inBar = null;
+	var page = parent.window.frames['page'];
+ -->
+</script>
+<!--<div id="text">目录树</div> -->
+<!--<table width='100%' style=' position:relative;top:-30px;z-index:-100;'><tr><td colspan='3' width='100%' height='30px' class='main'></td></tr></table> -->
+<script language="javascript">
+window.document.body.onselectstart=new Function("return false");
+
+var treeRight = new Array();
+for(var i = 1; i<100; i++){
+	treeRight.push(new Array);	
+}
+
+var openLast = null;
+	
+function Node(id, name, fatherId, right, subNum, isEnd, subArray, divHtml, isOpen){
+	this.id = id;
+	this.name = name;
+	this.fatherId = fatherId;
+	this.right = right;
+	
+	this.subNum = subNum;
+	this.isEnd = isEnd;
+	this.subArray = subArray;
+	
+	this.divHtml = divHtml;
+	this.end = "</div>"
+	
+	this.isOpen = isOpen;
+}
+//通过addNode 将所有节点存入treeRight
+function addNode(id, name, fatherId, right){
+	var a_node = new Node(id, name, fatherId, right, 0, true, new Array(), "", false);
+	var a_tree = treeRight[right];
+	a_tree.push(a_node);//alert(a_tree.length);
+}
+
+function getNode(id, right){
+	var a_tree =  treeRight[right];
+
+	for(var i=0; i<a_tree.length; i++){
+		if(a_tree[i].id == id){
+			return a_tree[i];
+		}
+	}
+	return null;
+}
+
+function getLastTree(){
+	var lastTree = null;
+	for(var i=0; i<treeRight.length; i++){
+		a_tree = treeRight[i];
+		if(a_tree.length == 0){
+			return lastTree;
+		}
+		lastTree = treeRight[i];
+	}
+	return null;
+}
+
+function refrashTree(){
+	
+}
+
+function over(id, right){
+	var bar = getNode(id, right);
+	var obj = document.getElementById("div"+id);
+	
+	obj.className = "over";
+	
+	if(parent.isDrag == true){
+		if(bar.isEnd == true){
+			drag_state.innerHTML = "<a style='color:green;'>&nbsp;&nbsp;ok</a>";
+			inBar = bar;
+		}else{
+			drag_state.innerHTML = "<a style='color:red;'>&nbsp;&nbsp;no</a>";
+			inBar = null;
+		}
+		
+		drag_info.innerHTML = "&nbsp;&nbsp;"+bar.name;
+	}
+}
+
+function out(id, right){
+	var bar = getNode(id, right);
+	var obj = document.getElementById("div"+id);
+	
+	obj.className = "out";
+	
+	if(parent.isDrag == true){
+		drag_state.innerHTML = "<a style='color:red;'>&nbsp;&nbsp;no</a>";
+		drag_info.innerHTML = "";
+		inBar = null;
+	}
+}
+
+function clickDiv(id, right){
+	var bar = getNode(id, right);//alert(bar.isEnd);if(openLast!=null){alert(bar.isEnd+"--------"+openLast.name);}
+	var subTree = bar.subArray;
+	if(bar.isOpen == false){
+		document.getElementById("td_"+id).className = "open";
+		for(var i=0; i<subTree.length; i++){
+			document.getElementById(subTree[i].id).className = "see";
+		}
+		bar.isOpen = true;
+		if(bar.isEnd == true){
+			if(openLast != null){
+				document.getElementById("td_"+openLast.id).className = "close";
+				openLast.isOpen = false;
+			}
+			openLast = bar;//alert(openLast);
+		}
+	}
+	else
+		if(bar.isOpen == true){
+			document.getElementById("td_"+id).className = "close";
+			for(var i=0; i<subTree.length; i++){
+				document.getElementById(subTree[i].id).className = "nosee";
+			}
+			bar.isOpen = false;
+			if(bar.isEnd == true){
+				openLast = null;
+			}
+		}
+		
+	if(id==21 || id==22){page.window.location = "./file_movie_1.html";};
+	if(id==31 || id==32){page.window.location = "./file_music_1.html";};
+	if(id==41 || id==42){page.window.location = "./file_pic_1.html";};
+	if(id==51 || id==52){page.window.location = "./file_other_1.html";};	
+}
+
+function creatTree(){
+	var lastTree = getLastTree();
+	var right = lastTree[0].right;
+
+	for(var i=0; i<lastTree.length; i++){
+		var bar = lastTree[i];
+		var barFather = getNode(bar.fatherId, right-1);	
+		barFather.isEnd = false;
+		barFather.subArray.push(bar);
+		var white = "";
+		for(var k=0; k<right; k++){
+			white += "&nbsp;&nbsp;";
+		}
+		bar.divHtml = "<div id='" +bar.id+"'"+" class='nosee'><div id='div"+bar.id+"' onclick='clickDiv("+bar.id+","+bar.right+");' onmouseout='out("+bar.id+","+bar.right+");' onmouseover='over("+bar.id+","+bar.right+");' class='out'><table><tr><td>"+white+"</td><td id='td_"+bar.id+"' class='close'>&nbsp;&nbsp;</td><td>"+bar.name+"</td></tr></table></div>";
+	}
+	
+	right--;
+
+	while(right > 0){
+		lastTree = treeRight[right];
+		
+		for(var i=0; i<lastTree.length; i++){
+			var bar = lastTree[i];
+			var barFather = getNode(bar.fatherId, right-1);
+			barFather.isEnd = false;
+			barFather.subArray.push(bar);
+			
+			var white = "";
+			for(var k=0; k<right; k++){
+				white += "&nbsp;&nbsp;";
+			}
+			bar.divHtml = "<div id='" +bar.id+"'"+" class='nosee'><div id='div"+bar.id+"' onclick='clickDiv("+bar.id+","+bar.right+");' onmouseout='out("+bar.id+","+bar.right+");' onmouseover='over("+bar.id+","+bar.right+");' class='out'><table><tr><td>"+white+"</td><td id='td_"+bar.id+"' class='close'>&nbsp;&nbsp;</td><td>"+bar.name+"</td></tr></table></div>";
+			
+			var a_bar = bar.subArray;
+			if(a_bar.length != 0){
+				for(var j=0; j<a_bar.length; j++){
+					bar.divHtml += "" + a_bar[j].divHtml + a_bar[j].end;
+				}
+			}
+		}
+		
+		right --;
+	}
+	
+	lastTree = treeRight[0];//alert(lastTree.length+"+++++"+lastTree[1].subArray.length)
+	
+	document.write("<div style='width:100%; position:absolute; left:0px; top: 0px;'>");
+	for(var i=0; i<2; i++){//alert();
+		var bar = lastTree[i];
+		
+		bar.divHtml = "<div id='" +bar.id+"'"+" class='frame'><div id='div"+bar.id+"' onclick='clickDiv("+bar.id+","+bar.right+");' onmouseout='' onmouseover='' class='main'><table style='height:25px'><tr valign='middle'><td></td><td id='td_"+bar.id+"' class='close'>&nbsp;&nbsp;</td><td>"+bar.name+"</td></tr></table></div>";
+		
+		var a_bar = bar.subArray;
+		for(var k=0; k< bar.subArray.length; k++){
+			bar.divHtml += "" + a_bar[k].divHtml + a_bar[k].end;
+		}
+		
+		bar.divHtml += bar.end + "";//alert(bar.divHtml);
+		document.write(bar.divHtml);
+	}
+	document.write("</div>");
+}
+
+addNode(11, "公共资源", null, 0);
+addNode(21,"视频", 11, 1);
+addNode(31, "音频",11, 1);
+addNode(41, "图片",11, 1);
+addNode(51, "其他", 11, 1);
+addNode(211, "视频1", 21, 2);
+addNode(212, "视频2", 21, 2);
+addNode(2121, "视频3", 211, 3);
+addNode(311, "音频1", 31, 2);
+addNode(312, "音频2", 31, 2);
+addNode(411, "图片1", 41, 2);
+addNode(412, "图片2", 41, 2);
+addNode(511, "其他1", 51, 2);
+addNode(512, "其他2", 51, 2);
+
+addNode(12, "内部资源", null, 0);
+addNode(22,"视频", 12, 1);
+addNode(32, "音频",12, 1);
+addNode(42, "图片",12, 1);
+addNode(52, "其他", 12, 1);
+
+creatTree();//alert(getNode(81, 2).isEnd);
+</script>
+
+<script language="javascript">
+<!--
+	var px = 8;
+	var py = 115;
+	
+	function resetDiv(){
+		parent.isDrag = false;
+	
+		drag_div.style.visibility = "hidden";
+		drag_div.style.left = 0;
+		drag_div.style.top = 0;
+	}
+	
+	function dragDiv(){
+		//parent.isDrag = true;
+		drag_div.style.left = event.x + px;
+		drag_div.style.top = event.y + py;
+		//document.getElementById('text').innerHTML=window.event.clientX+"####"+event.y+"---------"+parent.isDrag;
+	}
+	
+	function stopDiv(){
+		document.onmousemove= null;
+		document.onmouseup = null;
+		parent.isDrag = false;
+		
+		resetDiv();
+		
+		if(inBar != null){
+			alert("已移动到:"+inBar.name+"~");
+		}
+		//document.getElementById('text').innerHTML=window.event.clientX+"####"+event.y+"---------"+parent.isDrag;
+	}
+	
+	function judgeOver(){
+		if(parent.isDrag == true){
+			document.onmousemove= function(){dragDiv()};
+			document.onmouseup = function(){stopDiv();};
+			drag_div.style.visibility = "visible";
+		}
+	}
+	document.onmouseover = function(){judgeOver();};
+-->
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0.2//EN" "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
+<!--
+	Add the following DOCTYPE declaration as first line of your XXX-validation.xml file:
+	<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0.2//EN" "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
+-->
+<validators>
+	<field name="name">
+		<field-validator type="requiredstring">
+			<message>用户名不能为空！</message>
+		</field-validator>
+	</field>
+	<field name="age">
+		<field-validator type="int">
+			<param name="min">13</param>
+			<param name="max">19</param>
+			<message>年龄必须在13至19岁之间</message>
+		</field-validator>
+	</field>
+
+	
+
+</validators>
