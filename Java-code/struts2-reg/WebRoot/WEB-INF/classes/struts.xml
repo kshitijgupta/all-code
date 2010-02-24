@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="bookcode" extends='struts-default'>
+		<action name="Reg_ajax_Action" class="reg.Reg_ajax_Action">
+			<result name="input">/reg.jsp</result>
+			<result name="success" >/success.jsp</result>
+
+		</action>
+		
+	</package>
+</struts>

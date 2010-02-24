@@ -1,6 +1,0 @@
-#Sun Jan 31 23:12:42 HKT 2010
-LIBRARY_PATH="/opt/sun-jdk-1.6.0.17/jre/bin\:/home/luolei/Genuitec/Common/plugins/com.genuitec.eclipse.easie.tomcat.myeclipse_8.0.0.me200911090405/tomcat/bin"
-tomcat.configuration.version.current=2
-eclipse.preferences.version=1
-JDK_HOME=/opt/sun-jdk-1.6.0.17/jre
-ENDORSED_DIRS="/home/luolei/Genuitec/Common/plugins/com.genuitec.eclipse.easie.tomcat.myeclipse_8.0.0.me200911090405/tomcat/common/endorsed"

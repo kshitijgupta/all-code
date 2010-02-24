@@ -1,0 +1,8118 @@
+var pc = navigator.userAgent.toLowerCase();
+var ie4_win = (pc.indexOf("win")!=-1) && (pc.indexOf("msie") != -1)
+&& (parseInt(navigator.appVersion) >= 4);
+var checked = false;
+
+
+var is_gecko = pc.indexOf("gecko/") != -1 &&
+parseFloat(pc.substring(pc.indexOf("gecko/") + 6, pc.indexOf("gecko/") + 14)) > 20030108;
+
+function checkPost() {
+if (arguments.length > 0) { window.onbeforeunload = null; }
+
+if (!checked) {
+checked = true;
+return true;
+}
+return false;
+}
+
+function replaceAtCursor(text, ta) {
+var end = 0;
+var scrollTop = ta.scrollTop;
+
+ta.focus();
+
+if (document.selection && document.selection.createRange().parentElement().tagName == 'TEXTAREA') {
+var selected = document.selection.createRange().text;
+
+
+end = getSelectionRangeEnd(ta);
+
+
+document.selection.createRange().text = text;
+
+end += text.length;
+}
+else if (typeof(ta.selectionStart) != 'undefined' && typeof(ta.selectionEnd) != 'undefined') {
+var selLength = ta.textLength;
+var selStart = ta.selectionStart;
+var selEnd = ta.selectionEnd;
+if (selEnd == 1 || selEnd == 2) {
+selEnd = selLength;
+}
+
+var s1 = (ta.value).substring(0, selStart);
+var s2 = (ta.value).substring(selEnd, selLength);
+
+
+ta.value = s1 + text + s2;
+
+end = selEnd + text.length;
+}
+else {
+ta.value += text;
+}
+
+if (end > 0) {
+setCaretTo(ta, end, scrollTop);
+}
+}
+
+function insertAtCursor(text, ta) {
+var end = 0;
+var scrollTop = ta.scrollTop;
+
+ta.focus();
+
+if (document.selection && document.selection.createRange().parentElement().tagName == 'TEXTAREA') {
+var selected = document.selection.createRange().text;
+
+
+end = getSelectionRangeEnd(ta);
+
+
+document.selection.createRange().text = selected + text;
+
+end += text.length;
+}
+else if (typeof(ta.selectionStart) != 'undefined' && typeof(ta.selectionEnd) != 'undefined') {
+var selLength = ta.textLength;
+var selStart = ta.selectionStart;
+var selEnd = ta.selectionEnd;
+if (selEnd == 1 || selEnd == 2) {
+selEnd = selLength;
+}
+
+alert('selStart = ' + selStart + ", selEnd = " + selEnd);
+var s1 = (ta.value).substring(0, selEnd);
+var s2 = (ta.value).substring(selEnd, selLength);
+
+
+ta.value = s1 + text + s2;
+
+end = selEnd + text.length;
+}
+else {
+ta.value += text;
+}
+
+if (end > 0) {
+setCaretTo(ta, end, scrollTop);
+}
+}
+
+function styleTag(tag, endtag, ta) {
+var end = 0;
+var scrollTop = ta.scrollTop;
+
+if (document.selection) {
+if (document.selection.createRange().parentElement().tagName == 'TEXTAREA') {
+var selected = document.selection.createRange().text;
+
+
+end = getSelectionRangeEnd(ta);
+
+
+var r = _markupText(selected, tag, endtag);
+
+document.selection.createRange().text = r[0];
+
+end += r[1];
+}
+}
+else if (typeof(ta.selectionStart) != 'undefined' && typeof(ta.selectionEnd) != 'undefined') {
+if (ta.selectionStart == ta.selectionEnd) {
+return;
+}
+var selLength = ta.textLength;
+var selStart = ta.selectionStart;
+var selEnd = ta.selectionEnd;
+if (selEnd == 1 || selEnd == 2) {
+selEnd = selLength;
+}
+var s1 = (ta.value).substring(0, selStart);
+var s2 = (ta.value).substring(selStart, selEnd);
+var s3 = (ta.value).substring(selEnd, selLength);
+
+
+var r = _markupText(s2, tag, endtag);
+
+ta.value = s1 + r[0] + s3;
+
+end = selEnd + r[1];
+}
+else {
+return;
+}
+
+if (end > 0) {
+setCaretTo(ta, end, scrollTop);
+}
+}
+
+function _markupText(text, tag, endtag) {
+
+var r = trimLeadingSpace(text);
+text = r[0];
+var removeSpace = r[1];
+
+
+r = trimTrailingSpace(text);
+text = r[0];
+var addSpace = r[1];
+
+
+var addedCharacters = 0;
+
+if (text.indexOf('\n') > 0) {
+
+var lines = text.split('\n');
+var newText = '';
+for (var i = 0; i < lines.length; i++) {
+var line = lines[i];
+
+r = trimLeadingSpace(line);
+line = r[0];
+var leadingSpaces = r[1];
+
+
+r = trimTrailingSpace(line);
+line = r[0];
+var trailingSpaces = r[1];
+
+if (line == '') {
+newText += leadingSpaces + line + trailingSpaces;
+}
+else {
+newText += leadingSpaces + tag + line + endtag + trailingSpaces;
+addedCharacters += (tag.length + endtag.length);
+}
+
+if (i < lines.length -1) {
+newText += '\n';
+}
+}
+text = removeSpace + newText + addSpace;
+}
+else {
+text = removeSpace + tag + text + endtag + addSpace;
+}
+
+r = new Array(2);
+r[0] = text;
+r[1] = addedCharacters;
+
+return r;
+}
+
+function trimLeadingSpace(text) {
+var removeSpace = "";
+while (text.length > 0 &&
+(text.charAt(0) == ' ' ||
+text.charAt(0) == '\n' ||
+text.charAt(0) == '\r'))
+{
+removeSpace += text.charAt(0);
+text = text.substring(1);
+}
+
+var r = new Array(2);
+r[0] = text;
+r[1] = removeSpace;
+return r;
+}
+
+function trimTrailingSpace(text) {
+var addSpace = "";
+while (text.length > 0 &&
+(text.charAt(text.length-1) == ' ' ||
+text.charAt(text.length-1) == '\n' ||
+text.charAt(text.length-1) == '\r'))
+{
+addSpace += text.charAt(text.length-1);
+text = text.substring(0, text.length-1);
+}
+
+var r = new Array(2);
+r[0] = text;
+r[1] = addSpace;
+return r;
+}
+
+function getSelectionRangeText(ta) {
+if (document.selection) {
+
+return document.selection.createRange().text;
+}
+else if (is_gecko) {
+var start = ta.selectionStart;
+var end   = ta.selectionEnd;
+return ta.value.substr(start, end-start);
+}
+else {
+return '';
+}
+}
+
+function getSelectionRangeEnd(ta) {
+if (document.selection) {
+
+var range = document.selection.createRange();
+
+var stored_range = range.duplicate();
+
+stored_range.moveToElementText(ta);
+
+stored_range.setEndPoint('EndToEnd', range);
+
+
+var start = stored_range.text.length - range.text.length;
+return start + range.text.length;
+}
+else if (is_gecko) {
+return ta.selectionEnd;
+}
+else {
+return 0;
+}
+}
+function setCaretTo(ta, pos, scrollTop) {
+ta.focus();
+if (ta.createTextRange) {
+
+
+var i = 0;
+var count = 0;
+var text = ta.value;
+while (i > -1 && i < pos) {
+i = text.indexOf("\r\n", i);
+if (i >= 0) {
+count++;
+i += 2;
+}
+}
+
+if (count > 1) {
+count--;
+}
+
+
+var range = ta.createTextRange();
+range.move("character", (pos - count));
+range.select();
+}
+else if (ta.selectionStart) {
+ta.setSelectionRange(pos, pos);
+}
+
+
+if (scrollTop > 0) {
+ta.scrollTop = scrollTop;
+}
+}
+
+function caret(ta) {
+if (ie4_win && ta.createTextRange &&
+document.selection.createRange().parentElement().tagName == 'TEXTAREA')
+{
+ta.caretPos = document.selection.createRange().duplicate();
+}
+}
+
+
+
+
+function funcname(f) {
+var s = f.toString().match(/function (\w*)/)[1];
+if ((s == null) || (s.length == 0)) return "anonymous";
+return s;
+}
+
+
+function stacktrace() {
+var s = "";  // This is the string we'll return.
+
+
+
+for(var a = arguments.caller; a != null; a = a.caller) {
+
+s += funcname(a.callee) + "\n";
+
+
+
+
+if (a.caller == a) break;
+}
+return s;
+}
+
+function printStackTrace() {
+alert('stack trace is ' + stacktrace());
+}
+
+
+
+
+var hoverElements = new Array();
+
+function onhover(el) {
+hoverElements[el] = el.className;
+el.className = el.className + " hilite";
+}
+
+function onhoverbyclass(el, cl) {
+hoverElements[el] = el.className;
+el.className = el.className + " " + cl;
+}
+
+function offhover(el) {
+if (hoverElements[el]) {
+el.className = hoverElements[el];
+}
+}
+
+function onclick(el) {
+onhover(el);
+}
+
+
+function clearhover(el) {
+el.className = el.className.replace(/hilite/g, "")
+}
+
+
+
+
+
+
+
+var textareaResizer = {};
+var currentDisplayMode = "textarea"; // textarea or spell
+
+
+
+
+function textareaResizeTo(h) {
+h = parseInt(h);
+
+
+var editorArea = document.getElementById(textareaResizer.editor_id);
+var previewPanel = document.getElementById('preview-panel');
+var spellCheckDiv = document.getElementById('jive-spell-markup-div');
+
+editorArea.style.height = h + "px";
+
+if (previewPanel) {
+previewPanel.style.height = h + "px";
+}
+if (spellCheckDiv) {
+spellCheckDiv.style.height = h + "px";
+}
+}
+
+
+
+
+function textareaResizeEventHandler(e) {
+var resizer = textareaResizer;
+
+
+if (!resizer.resizing)
+return;
+
+e = typeof(e) == "undefined" ? window.event : e;
+
+
+var dy = e.screenY - resizer.downY;
+var resizeBox = resizer.resizeBox;
+
+switch (e.type) {
+case "mousemove":
+var w, h;
+
+
+h = resizer.height + dy;
+
+
+h = h < 150 ? 150 : h;
+
+
+
+
+resizeBox.style.height = h + "px";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+break;
+
+case "mouseup":
+textareaSetResizing(e, resizer.editor_id, false);
+
+var h = resizer.height + dy;
+h = h < 150 ? 150 : h;
+textareaResizeTo(h);
+
+
+
+
+var expires = new Date();
+expires.setTime(expires.getTime() + 3600000 * 24 * 365);
+
+
+
+setCookie("jive_" + resizer.editor_id + "_height", "" + h, expires);
+
+
+
+setCookie("TinyMCE_GUIEditor_height", "" + h, expires);
+
+break;
+default:
+
+break;
+}
+};
+
+
+
+
+function textareaSetResizing(e, editor_id, state) {
+e = typeof(e) == "undefined" ? window.event : e;
+
+var resizer = textareaResizer;
+var editorArea = document.getElementById(editor_id);
+var resizeBox = document.getElementById(editor_id + 'ResizeBox');
+var spellCheckDiv = document.getElementById('jive-spell-markup-div');
+
+if (state) {
+
+document.ondragstart = function() { return false; }
+
+
+var width = editorArea.offsetWidth;
+var height = editorArea.clientHeight;
+resizeBox.style.width = width + "px";
+resizeBox.style.height = height + "px";
+resizer.iframeWidth = width;
+resizer.iframeHeight = height;
+
+
+editorArea.style.display = "none";
+if (spellCheckDiv) {
+if (spellCheckDiv.style.display == "block") {
+currentDisplayMode = "spell";
+}
+else {
+currentDisplayMode = "textarea";
+}
+spellCheckDiv.style.display = "none";
+}
+resizeBox.style.display = "block";
+
+
+if (!resizer.eventHandlers) {
+if (navigator.appName == "Microsoft Internet Explorer") {
+addEvent(document, "mousemove", textareaResizeEventHandler);
+}
+else {
+addEvent(window, "mousemove", textareaResizeEventHandler);
+}
+addEvent(document, "mouseup", textareaResizeEventHandler);
+
+resizer.eventHandlers = true;
+}
+
+resizer.resizing = true;
+resizer.downX = e.screenX;
+resizer.downY = e.screenY;
+resizer.width = parseInt(resizeBox.style.width);
+resizer.height = parseInt(resizeBox.style.height);
+resizer.resizeBox = resizeBox;
+resizer.editor_id = editor_id;
+}
+else {
+
+document.ondragstart = function() { return true;}
+
+resizer.resizing = false;
+resizeBox.style.display = "none";
+editorArea.style.display = "block";
+
+if (spellCheckDiv && currentDisplayMode == "spell") {
+spellCheckDiv.style.width = editorArea.offsetWidth;
+spellCheckDiv.style.display = "block";
+}
+}
+};
+
+function addEvent(obj, name, handler) {
+if (obj.attachEvent) {
+obj.attachEvent("on" + name, handler);
+}
+else {
+obj.addEventListener(name, handler, true);
+}
+};
+
+
+function setCookie(name, value, expires, path, domain, secure) {
+var curCookie = name + "=" + escape(value) +
+((expires) ? "; expires=" + expires.toGMTString() : "") +
+((path) ? "; path=" + escape(path) : "") +
+((domain) ? "; domain=" + domain : "") +
+((secure) ? "; secure" : "");
+
+document.cookie = curCookie;
+};
+
+function getCookie(name) {
+var dc = document.cookie;
+var prefix = name + "=";
+var begin = dc.indexOf("; " + prefix);
+
+if (begin == -1) {
+begin = dc.indexOf(prefix);
+
+if (begin != 0) {
+return null;
+}
+}
+else {
+begin += 2;
+}
+
+var end = document.cookie.indexOf(";", begin);
+
+if (end == -1) {
+end = dc.length;
+}
+
+return unescape(dc.substring(begin + prefix.length, end));
+};
+
+
+
+
+function isAdvancedEditorBrowser() {
+
+if (typeof(document.execCommand) == 'undefined') {
+return false;
+}
+
+
+var agent = navigator.userAgent.toLowerCase();
+var aVer = navigator.appVersion.toLowerCase();
+var minor = parseFloat(aVer);
+var major = parseInt(minor);
+
+
+if (agent.indexOf("applewebkit") != -1) {
+return false;
+}
+
+
+var msie = (navigator.appName == "Microsoft Internet Explorer");
+var msie3 = (agent.indexOf("msie 3") != -1);
+var msie4 = (agent.indexOf("msie 4") != -1);
+var msie5up = (msie && !msie3 && !msie4);
+if (msie5up) {
+return true;
+}
+
+
+var opera = (agent.indexOf("opera") != -1);
+var opera2 = (agent.indexOf("opera 2") != -1 || agent.indexOf("opera/2") != -1);
+var opera3 = (agent.indexOf("opera 3") != -1 || agent.indexOf("opera/3") != -1);
+var opera4 = (agent.indexOf("opera 4") != -1 || agent.indexOf("opera/4") != -1);
+var opera5 = (agent.indexOf("opera 5") != -1 || agent.indexOf("opera/5") != -1);
+var opera6 = (agent.indexOf("opera 6") != -1 || agent.indexOf("opera/6") != -1);
+var opera7 = (agent.indexOf("opera 7") != -1 || agent.indexOf("opera/7") != -1);
+var opera8 = (agent.indexOf("opera 8") != -1 || agent.indexOf("opera/8") != -1);
+
+var opera9 = (agent.indexOf("opera 9") != -1 || agent.indexOf("opera/9") != -1);
+var opera10up = (opera && !opera2 && !opera3 && !opera4 && !opera5
+&& !opera6 && !opera7 && !opera8 && !opera9);
+
+if (opera10up) {
+return true;
+}
+
+if (agent.indexOf('gecko') != -1 && agent.indexOf('khtml') == -1) {
+return true;
+}
+
+return false;
+}
+
+function isTextEditorBrowser() {
+if (isAdvancedEditorBrowser()) {
+return true;
+}
+
+var agent = navigator.userAgent.toLowerCase();
+
+if (agent.indexOf("applewebkit") != -1) {
+return true;
+}
+
+var opera6 = (agent.indexOf("opera 6") != -1 || agent.indexOf("opera/6") != -1);
+var opera7 = (agent.indexOf("opera 7") != -1 || agent.indexOf("opera/7") != -1);
+var opera8 = (agent.indexOf("opera 8") != -1 || agent.indexOf("opera/8") != -1);
+var opera9 = (agent.indexOf("opera 9") != -1 || agent.indexOf("opera/9") != -1);
+
+
+if (opera6 || opera7 || opera8 || opera9) {
+return true;
+}
+
+if (document.getElementById) {
+return true;
+}
+
+return false;
+}
+
+function isTabbableBrowser() {
+return (typeof(document.getElementById) != 'undefined');
+}
+
+
+
+
+function quoteOriginal(editor_id) {
+var ta = document.getElementById(editor_id);
+
+var quote = _jive_plain_quote_text.replace(/\&gt;/g, ">");
+quote = quote.replace(/\&lt;/g, "<");
+quote = quote.replace(/\&amp;/g, "&");
+quote = quote.replace(/\&quot;/g, "\"");
+
+ta.value = quote + '\n' + ta.value;
+ta.focus();
+
+return false;
+}
+
+var spellCheckWindow;
+var popupBlockerAlertMessage = "Sorry, but we have noticed that your popup-blocker has disabled a window that provides the spell checking functionality. You will need to disable popup blocking on this site in order to spell check your post.";
+
+function spellForm(textAreaField) {
+var width = 600;
+var height = 450;
+var x = parseInt(screen.width / 2.0) - (width / 2.0);
+var y = parseInt(screen.height / 2.0) - (height / 2.0);
+var options = "top=" + y + ",left=" + x + ",scrollbars=no,dialog=true,status=no,minimizable=true,modal=false,width=" + width + ",height=" + height + ",resizable=yes";
+spellCheckWindow = window.open(_jive_base_url + "/include/popupspellchecker/jivespell.jsp", "spellcheckwindow", options);
+if (spellCheckWindow == null) {
+alert(popupBlockerAlertMessage);
+return;
+}
+initializeSpellWindow(textAreaField);
+
+return false;
+}
+
+function initializeSpellWindow(textAreaField) {
+
+try
+{
+if (spellCheckWindow.setupSpellChecker) {
+
+var text = document.getElementById(textAreaField).value;
+
+spellCheckWindow.setupSpellChecker(textAreaField, text, 'spellWindowCloseHandler');
+eval('try { spellCheckWindow.resizeTo(width, height); } catch(e) { }');
+spellCheckWindow.focus();
+}
+else
+{
+var t = "initializeSpellWindow('" + textAreaField + "')";
+setTimeout(t, 500);
+}
+}
+catch(ex) {
+
+var t = "initializeSpellWindow('" + textAreaField + "')";
+setTimeout(t, 500);
+}
+}
+function spellWindowCloseHandler(sourceElementID, text) {
+text = text.replace(/\&gt;/g, ">");
+text = text.replace(/\&lt;/g, "<");
+text = text.replace(/\&amp;/g, "&");
+text = text.replace(/\&quot;/g, "\"");
+text = text.replace(/\&nbsp;/g, " ");
+document.getElementById(sourceElementID).value = text;
+autoSave.messageChangeHandler();
+}
+
+
+
+
+
+
+
+
+
+var Prototype = {
+Version: '1.5.0',
+BrowserFeatures: {
+XPath: !!document.evaluate
+},
+
+ScriptFragment: '(?:<script.*?>)((\n|\r|.)*?)(?:<\/script>)',
+emptyFunction: function() {},
+K: function(x) { return x }
+}
+
+var Class = {
+create: function() {
+return function() {
+this.initialize.apply(this, arguments);
+}
+}
+}
+
+var Abstract = new Object();
+
+Object.extend = function(destination, source) {
+for (var property in source) {
+destination[property] = source[property];
+}
+return destination;
+}
+
+Object.extend(Object, {
+inspect: function(object) {
+try {
+if (object === undefined) return 'undefined';
+if (object === null) return 'null';
+return object.inspect ? object.inspect() : object.toString();
+} catch (e) {
+if (e instanceof RangeError) return '...';
+throw e;
+}
+},
+
+keys: function(object) {
+var keys = [];
+for (var property in object)
+keys.push(property);
+return keys;
+},
+
+values: function(object) {
+var values = [];
+for (var property in object)
+values.push(object[property]);
+return values;
+},
+
+clone: function(object) {
+return Object.extend({}, object);
+}
+});
+
+Function.prototype.bind = function() {
+var __method = this, args = $A(arguments), object = args.shift();
+return function() {
+return __method.apply(object, args.concat($A(arguments)));
+}
+}
+
+Function.prototype.bindAsEventListener = function(object) {
+var __method = this, args = $A(arguments), object = args.shift();
+return function(event) {
+return __method.apply(object, [( event || window.event)].concat(args).concat($A(arguments)));
+}
+}
+
+Object.extend(Number.prototype, {
+toColorPart: function() {
+var digits = this.toString(16);
+if (this < 16) return '0' + digits;
+return digits;
+},
+
+succ: function() {
+return this + 1;
+},
+
+times: function(iterator) {
+$R(0, this, true).each(iterator);
+return this;
+}
+});
+
+var Try = {
+these: function() {
+var returnValue;
+
+for (var i = 0, length = arguments.length; i < length; i++) {
+var lambda = arguments[i];
+try {
+returnValue = lambda();
+break;
+} catch (e) {}
+}
+
+return returnValue;
+}
+}
+
+
+
+var PeriodicalExecuter = Class.create();
+PeriodicalExecuter.prototype = {
+initialize: function(callback, frequency) {
+this.callback = callback;
+this.frequency = frequency;
+this.currentlyExecuting = false;
+
+this.registerCallback();
+},
+
+registerCallback: function() {
+this.timer = setInterval(this.onTimerEvent.bind(this), this.frequency * 1000);
+},
+
+stop: function() {
+if (!this.timer) return;
+clearInterval(this.timer);
+this.timer = null;
+},
+
+onTimerEvent: function() {
+if (!this.currentlyExecuting) {
+try {
+this.currentlyExecuting = true;
+this.callback(this);
+} finally {
+this.currentlyExecuting = false;
+}
+}
+}
+}
+String.interpret = function(value){
+return value == null ? '' : String(value);
+}
+
+Object.extend(String.prototype, {
+gsub: function(pattern, replacement) {
+var result = '', source = this, match;
+replacement = arguments.callee.prepareReplacement(replacement);
+
+while (source.length > 0) {
+if (match = source.match(pattern)) {
+result += source.slice(0, match.index);
+result += String.interpret(replacement(match));
+source  = source.slice(match.index + match[0].length);
+} else {
+result += source, source = '';
+}
+}
+return result;
+},
+
+sub: function(pattern, replacement, count) {
+replacement = this.gsub.prepareReplacement(replacement);
+count = count === undefined ? 1 : count;
+
+return this.gsub(pattern, function(match) {
+if (--count < 0) return match[0];
+return replacement(match);
+});
+},
+
+scan: function(pattern, iterator) {
+this.gsub(pattern, iterator);
+return this;
+},
+
+truncate: function(length, truncation) {
+length = length || 30;
+truncation = truncation === undefined ? '...' : truncation;
+return this.length > length ?
+this.slice(0, length - truncation.length) + truncation : this;
+},
+
+strip: function() {
+return this.replace(/^\s+/, '').replace(/\s+$/, '');
+},
+
+stripTags: function() {
+return this.replace(/<\/?[^>]+>/gi, '');
+},
+
+stripScripts: function() {
+return this.replace(new RegExp(Prototype.ScriptFragment, 'img'), '');
+},
+
+extractScripts: function() {
+var matchAll = new RegExp(Prototype.ScriptFragment, 'img');
+var matchOne = new RegExp(Prototype.ScriptFragment, 'im');
+return (this.match(matchAll) || []).map(function(scriptTag) {
+return (scriptTag.match(matchOne) || ['', ''])[1];
+});
+},
+
+evalScripts: function() {
+return this.extractScripts().map(function(script) { return eval(script) });
+},
+
+escapeHTML: function() {
+var div = document.createElement('div');
+var text = document.createTextNode(this);
+div.appendChild(text);
+return div.innerHTML;
+},
+
+unescapeHTML: function() {
+var div = document.createElement('div');
+div.innerHTML = this.stripTags();
+return div.childNodes[0] ? (div.childNodes.length > 1 ?
+$A(div.childNodes).inject('',function(memo,node){ return memo+node.nodeValue }) :
+div.childNodes[0].nodeValue) : '';
+},
+
+toQueryParams: function(separator) {
+var match = this.strip().match(/([^?#]*)(#.*)?$/);
+if (!match) return {};
+
+return match[1].split(separator || '&').inject({}, function(hash, pair) {
+if ((pair = pair.split('='))[0]) {
+var name = decodeURIComponent(pair[0]);
+var value = pair[1] ? decodeURIComponent(pair[1]) : undefined;
+
+if (hash[name] !== undefined) {
+if (hash[name].constructor != Array)
+hash[name] = [hash[name]];
+if (value) hash[name].push(value);
+}
+else hash[name] = value;
+}
+return hash;
+});
+},
+
+toArray: function() {
+return this.split('');
+},
+
+succ: function() {
+return this.slice(0, this.length - 1) +
+String.fromCharCode(this.charCodeAt(this.length - 1) + 1);
+},
+
+camelize: function() {
+var parts = this.split('-'), len = parts.length;
+if (len == 1) return parts[0];
+
+var camelized = this.charAt(0) == '-'
+? parts[0].charAt(0).toUpperCase() + parts[0].substring(1)
+: parts[0];
+
+for (var i = 1; i < len; i++)
+camelized += parts[i].charAt(0).toUpperCase() + parts[i].substring(1);
+
+return camelized;
+},
+
+capitalize: function(){
+return this.charAt(0).toUpperCase() + this.substring(1).toLowerCase();
+},
+
+underscore: function() {
+return this.gsub(/::/, '/').gsub(/([A-Z]+)([A-Z][a-z])/,'#{1}_#{2}').gsub(/([a-z\d])([A-Z])/,'#{1}_#{2}').gsub(/-/,'_').toLowerCase();
+},
+
+dasherize: function() {
+return this.gsub(/_/,'-');
+},
+
+inspect: function(useDoubleQuotes) {
+var escapedString = this.replace(/\\/g, '\\\\');
+if (useDoubleQuotes)
+return '"' + escapedString.replace(/"/g, '\\"') + '"';
+else
+return "'" + escapedString.replace(/'/g, '\\\'') + "'";
+}
+});
+
+String.prototype.gsub.prepareReplacement = function(replacement) {
+if (typeof replacement == 'function') return replacement;
+var template = new Template(replacement);
+return function(match) { return template.evaluate(match) };
+}
+
+String.prototype.parseQuery = String.prototype.toQueryParams;
+
+var Template = Class.create();
+Template.Pattern = /(^|.|\r|\n)(#\{(.*?)\})/;
+Template.prototype = {
+initialize: function(template, pattern) {
+this.template = template.toString();
+this.pattern  = pattern || Template.Pattern;
+},
+
+evaluate: function(object) {
+return this.template.gsub(this.pattern, function(match) {
+var before = match[1];
+if (before == '\\') return match[2];
+return before + String.interpret(object[match[3]]);
+});
+}
+}
+
+var $break    = new Object();
+var $continue = new Object();
+
+var Enumerable = {
+each: function(iterator) {
+var index = 0;
+try {
+this._each(function(value) {
+try {
+iterator(value, index++);
+} catch (e) {
+if (e != $continue) throw e;
+}
+});
+} catch (e) {
+if (e != $break) throw e;
+}
+return this;
+},
+
+eachSlice: function(number, iterator) {
+var index = -number, slices = [], array = this.toArray();
+while ((index += number) < array.length)
+slices.push(array.slice(index, index+number));
+return slices.map(iterator);
+},
+
+all: function(iterator) {
+var result = true;
+this.each(function(value, index) {
+result = result && !!(iterator || Prototype.K)(value, index);
+if (!result) throw $break;
+});
+return result;
+},
+
+any: function(iterator) {
+var result = false;
+this.each(function(value, index) {
+if (result = !!(iterator || Prototype.K)(value, index))
+throw $break;
+});
+return result;
+},
+
+collect: function(iterator) {
+var results = [];
+this.each(function(value, index) {
+results.push((iterator || Prototype.K)(value, index));
+});
+return results;
+},
+
+detect: function(iterator) {
+var result;
+this.each(function(value, index) {
+if (iterator(value, index)) {
+result = value;
+throw $break;
+}
+});
+return result;
+},
+
+findAll: function(iterator) {
+var results = [];
+this.each(function(value, index) {
+if (iterator(value, index))
+results.push(value);
+});
+return results;
+},
+
+grep: function(pattern, iterator) {
+var results = [];
+this.each(function(value, index) {
+var stringValue = value.toString();
+if (stringValue.match(pattern))
+results.push((iterator || Prototype.K)(value, index));
+})
+return results;
+},
+
+include: function(object) {
+var found = false;
+this.each(function(value) {
+if (value == object) {
+found = true;
+throw $break;
+}
+});
+return found;
+},
+
+inGroupsOf: function(number, fillWith) {
+fillWith = fillWith === undefined ? null : fillWith;
+return this.eachSlice(number, function(slice) {
+while(slice.length < number) slice.push(fillWith);
+return slice;
+});
+},
+
+inject: function(memo, iterator) {
+this.each(function(value, index) {
+memo = iterator(memo, value, index);
+});
+return memo;
+},
+
+invoke: function(method) {
+var args = $A(arguments).slice(1);
+return this.map(function(value) {
+return value[method].apply(value, args);
+});
+},
+
+max: function(iterator) {
+var result;
+this.each(function(value, index) {
+value = (iterator || Prototype.K)(value, index);
+if (result == undefined || value >= result)
+result = value;
+});
+return result;
+},
+
+min: function(iterator) {
+var result;
+this.each(function(value, index) {
+value = (iterator || Prototype.K)(value, index);
+if (result == undefined || value < result)
+result = value;
+});
+return result;
+},
+
+partition: function(iterator) {
+var trues = [], falses = [];
+this.each(function(value, index) {
+((iterator || Prototype.K)(value, index) ?
+trues : falses).push(value);
+});
+return [trues, falses];
+},
+
+pluck: function(property) {
+var results = [];
+this.each(function(value, index) {
+results.push(value[property]);
+});
+return results;
+},
+
+reject: function(iterator) {
+var results = [];
+this.each(function(value, index) {
+if (!iterator(value, index))
+results.push(value);
+});
+return results;
+},
+
+sortBy: function(iterator) {
+return this.map(function(value, index) {
+return {value: value, criteria: iterator(value, index)};
+}).sort(function(left, right) {
+var a = left.criteria, b = right.criteria;
+return a < b ? -1 : a > b ? 1 : 0;
+}).pluck('value');
+},
+
+toArray: function() {
+return this.map();
+},
+
+zip: function() {
+var iterator = Prototype.K, args = $A(arguments);
+if (typeof args.last() == 'function')
+iterator = args.pop();
+
+var collections = [this].concat(args).map($A);
+return this.map(function(value, index) {
+return iterator(collections.pluck(index));
+});
+},
+
+size: function() {
+return this.toArray().length;
+},
+
+inspect: function() {
+return '#<Enumerable:' + this.toArray().inspect() + '>';
+}
+}
+
+Object.extend(Enumerable, {
+map:     Enumerable.collect,
+find:    Enumerable.detect,
+select:  Enumerable.findAll,
+member:  Enumerable.include,
+entries: Enumerable.toArray
+});
+var $A = Array.from = function(iterable) {
+if (!iterable) return [];
+if (iterable.toArray) {
+return iterable.toArray();
+} else {
+var results = [];
+for (var i = 0, length = iterable.length; i < length; i++)
+results.push(iterable[i]);
+return results;
+}
+}
+
+Object.extend(Array.prototype, Enumerable);
+
+if (!Array.prototype._reverse)
+Array.prototype._reverse = Array.prototype.reverse;
+
+Object.extend(Array.prototype, {
+_each: function(iterator) {
+for (var i = 0, length = this.length; i < length; i++)
+iterator(this[i]);
+},
+
+clear: function() {
+this.length = 0;
+return this;
+},
+
+first: function() {
+return this[0];
+},
+
+last: function() {
+return this[this.length - 1];
+},
+
+compact: function() {
+return this.select(function(value) {
+return value != null;
+});
+},
+
+flatten: function() {
+return this.inject([], function(array, value) {
+return array.concat(value && value.constructor == Array ?
+value.flatten() : [value]);
+});
+},
+
+without: function() {
+var values = $A(arguments);
+return this.select(function(value) {
+return !values.include(value);
+});
+},
+
+indexOf: function(object) {
+for (var i = 0, length = this.length; i < length; i++)
+if (this[i] == object) return i;
+return -1;
+},
+
+reverse: function(inline) {
+return (inline !== false ? this : this.toArray())._reverse();
+},
+
+reduce: function() {
+return this.length > 1 ? this : this[0];
+},
+
+uniq: function() {
+return this.inject([], function(array, value) {
+return array.include(value) ? array : array.concat([value]);
+});
+},
+
+clone: function() {
+return [].concat(this);
+},
+
+size: function() {
+return this.length;
+},
+
+inspect: function() {
+return '[' + this.map(Object.inspect).join(', ') + ']';
+}
+});
+
+Array.prototype.toArray = Array.prototype.clone;
+
+function $w(string){
+string = string.strip();
+return string ? string.split(/\s+/) : [];
+}
+
+if(window.opera){
+Array.prototype.concat = function(){
+var array = [];
+for(var i = 0, length = this.length; i < length; i++) array.push(this[i]);
+for(var i = 0, length = arguments.length; i < length; i++) {
+if(arguments[i].constructor == Array) {
+for(var j = 0, arrayLength = arguments[i].length; j < arrayLength; j++)
+array.push(arguments[i][j]);
+} else {
+array.push(arguments[i]);
+}
+}
+return array;
+}
+}
+var Hash = function(obj) {
+Object.extend(this, obj || {});
+};
+
+Object.extend(Hash, {
+toQueryString: function(obj) {
+var parts = [];
+
+this.prototype._each.call(obj, function(pair) {
+if (!pair.key) return;
+
+if (pair.value && pair.value.constructor == Array) {
+var values = pair.value.compact();
+if (values.length < 2) pair.value = values.reduce();
+else {
+key = encodeURIComponent(pair.key);
+values.each(function(value) {
+value = value != undefined ? encodeURIComponent(value) : '';
+parts.push(key + '=' + encodeURIComponent(value));
+});
+return;
+}
+}
+if (pair.value == undefined) pair[1] = '';
+parts.push(pair.map(encodeURIComponent).join('='));
+});
+
+return parts.join('&');
+}
+});
+
+Object.extend(Hash.prototype, Enumerable);
+Object.extend(Hash.prototype, {
+_each: function(iterator) {
+for (var key in this) {
+var value = this[key];
+if (value && value == Hash.prototype[key]) continue;
+
+var pair = [key, value];
+pair.key = key;
+pair.value = value;
+iterator(pair);
+}
+},
+
+keys: function() {
+return this.pluck('key');
+},
+
+values: function() {
+return this.pluck('value');
+},
+
+merge: function(hash) {
+return $H(hash).inject(this, function(mergedHash, pair) {
+mergedHash[pair.key] = pair.value;
+return mergedHash;
+});
+},
+
+remove: function() {
+var result;
+for(var i = 0, length = arguments.length; i < length; i++) {
+var value = this[arguments[i]];
+if (value !== undefined){
+if (result === undefined) result = value;
+else {
+if (result.constructor != Array) result = [result];
+result.push(value)
+}
+}
+delete this[arguments[i]];
+}
+return result;
+},
+
+toQueryString: function() {
+return Hash.toQueryString(this);
+},
+
+inspect: function() {
+return '#<Hash:{' + this.map(function(pair) {
+return pair.map(Object.inspect).join(': ');
+}).join(', ') + '}>';
+}
+});
+
+function $H(object) {
+if (object && object.constructor == Hash) return object;
+return new Hash(object);
+};
+ObjectRange = Class.create();
+Object.extend(ObjectRange.prototype, Enumerable);
+Object.extend(ObjectRange.prototype, {
+initialize: function(start, end, exclusive) {
+this.start = start;
+this.end = end;
+this.exclusive = exclusive;
+},
+
+_each: function(iterator) {
+var value = this.start;
+while (this.include(value)) {
+iterator(value);
+value = value.succ();
+}
+},
+
+include: function(value) {
+if (value < this.start)
+return false;
+if (this.exclusive)
+return value < this.end;
+return value <= this.end;
+}
+});
+
+var $R = function(start, end, exclusive) {
+return new ObjectRange(start, end, exclusive);
+}
+
+var Ajax = {
+getTransport: function() {
+return Try.these(
+function() {return new XMLHttpRequest()},
+function() {return new ActiveXObject('Msxml2.XMLHTTP')},
+function() {return new ActiveXObject('Microsoft.XMLHTTP')}
+) || false;
+},
+
+activeRequestCount: 0
+}
+
+Ajax.Responders = {
+responders: [],
+
+_each: function(iterator) {
+this.responders._each(iterator);
+},
+
+register: function(responder) {
+if (!this.include(responder))
+this.responders.push(responder);
+},
+
+unregister: function(responder) {
+this.responders = this.responders.without(responder);
+},
+
+dispatch: function(callback, request, transport, json) {
+this.each(function(responder) {
+if (typeof responder[callback] == 'function') {
+try {
+responder[callback].apply(responder, [request, transport, json]);
+} catch (e) {}
+}
+});
+}
+};
+
+Object.extend(Ajax.Responders, Enumerable);
+
+Ajax.Responders.register({
+onCreate: function() {
+Ajax.activeRequestCount++;
+},
+onComplete: function() {
+Ajax.activeRequestCount--;
+}
+});
+
+Ajax.Base = function() {};
+Ajax.Base.prototype = {
+setOptions: function(options) {
+this.options = {
+method:       'post',
+asynchronous: true,
+contentType:  'application/x-www-form-urlencoded',
+encoding:     'UTF-8',
+parameters:   ''
+}
+Object.extend(this.options, options || {});
+
+this.options.method = this.options.method.toLowerCase();
+if (typeof this.options.parameters == 'string')
+this.options.parameters = this.options.parameters.toQueryParams();
+}
+}
+
+Ajax.Request = Class.create();
+Ajax.Request.Events =
+['Uninitialized', 'Loading', 'Loaded', 'Interactive', 'Complete'];
+
+Ajax.Request.prototype = Object.extend(new Ajax.Base(), {
+_complete: false,
+
+initialize: function(url, options) {
+this.transport = Ajax.getTransport();
+this.setOptions(options);
+this.request(url);
+},
+
+request: function(url) {
+this.url = url;
+this.method = this.options.method;
+var params = this.options.parameters;
+
+if (!['get', 'post'].include(this.method)) {
+
+params['_method'] = this.method;
+this.method = 'post';
+}
+
+params = Hash.toQueryString(params);
+if (params && /Konqueror|Safari|KHTML/.test(navigator.userAgent)) params += '&_='
+
+
+if (this.method == 'get' && params)
+this.url += (this.url.indexOf('?') > -1 ? '&' : '?') + params;
+
+try {
+Ajax.Responders.dispatch('onCreate', this, this.transport);
+
+this.transport.open(this.method.toUpperCase(), this.url,
+this.options.asynchronous);
+
+if (this.options.asynchronous)
+setTimeout(function() { this.respondToReadyState(1) }.bind(this), 10);
+
+this.transport.onreadystatechange = this.onStateChange.bind(this);
+this.setRequestHeaders();
+
+var body = this.method == 'post' ? (this.options.postBody || params) : null;
+
+this.transport.send(body);
+
+
+if (!this.options.asynchronous && this.transport.overrideMimeType)
+this.onStateChange();
+
+}
+catch (e) {
+this.dispatchException(e);
+}
+},
+
+onStateChange: function() {
+var readyState = this.transport.readyState;
+if (readyState > 1 && !((readyState == 4) && this._complete))
+this.respondToReadyState(this.transport.readyState);
+},
+
+setRequestHeaders: function() {
+var headers = {
+'X-Requested-With': 'XMLHttpRequest',
+'X-Prototype-Version': Prototype.Version,
+'Accept': 'text/javascript, text/html, application/xml, text/xml, */*'
+};
+
+if (this.method == 'post') {
+headers['Content-type'] = this.options.contentType +
+(this.options.encoding ? '; charset=' + this.options.encoding : '');
+
+
+
+
+
+if (this.transport.overrideMimeType &&
+(navigator.userAgent.match(/Gecko\/(\d{4})/) || [0,2005])[1] < 2005)
+headers['Connection'] = 'close';
+}
+
+
+if (typeof this.options.requestHeaders == 'object') {
+var extras = this.options.requestHeaders;
+
+if (typeof extras.push == 'function')
+for (var i = 0, length = extras.length; i < length; i += 2)
+headers[extras[i]] = extras[i+1];
+else
+$H(extras).each(function(pair) { headers[pair.key] = pair.value });
+}
+
+for (var name in headers)
+this.transport.setRequestHeader(name, headers[name]);
+},
+
+success: function() {
+return !this.transport.status
+|| (this.transport.status >= 200 && this.transport.status < 300);
+},
+
+respondToReadyState: function(readyState) {
+var state = Ajax.Request.Events[readyState];
+var transport = this.transport, json = this.evalJSON();
+
+if (state == 'Complete') {
+try {
+this._complete = true;
+(this.options['on' + this.transport.status]
+|| this.options['on' + (this.success() ? 'Success' : 'Failure')]
+|| Prototype.emptyFunction)(transport, json);
+} catch (e) {
+this.dispatchException(e);
+}
+
+if ((this.getHeader('Content-type') || 'text/javascript').strip().
+match(/^(text|application)\/(x-)?(java|ecma)script(;.*)?$/i))
+this.evalResponse();
+}
+
+try {
+(this.options['on' + state] || Prototype.emptyFunction)(transport, json);
+Ajax.Responders.dispatch('on' + state, this, transport, json);
+} catch (e) {
+this.dispatchException(e);
+}
+
+if (state == 'Complete') {
+
+this.transport.onreadystatechange = Prototype.emptyFunction;
+}
+},
+
+getHeader: function(name) {
+try {
+return this.transport.getResponseHeader(name);
+} catch (e) { return null }
+},
+
+evalJSON: function() {
+try {
+var json = this.getHeader('X-JSON');
+return json ? eval('(' + json + ')') : null;
+} catch (e) { return null }
+},
+
+evalResponse: function() {
+try {
+return eval(this.transport.responseText);
+} catch (e) {
+this.dispatchException(e);
+}
+},
+
+dispatchException: function(exception) {
+(this.options.onException || Prototype.emptyFunction)(this, exception);
+Ajax.Responders.dispatch('onException', this, exception);
+}
+});
+
+Ajax.Updater = Class.create();
+
+Object.extend(Object.extend(Ajax.Updater.prototype, Ajax.Request.prototype), {
+initialize: function(container, url, options) {
+this.container = {
+success: (container.success || container),
+failure: (container.failure || (container.success ? null : container))
+}
+
+this.transport = Ajax.getTransport();
+this.setOptions(options);
+
+var onComplete = this.options.onComplete || Prototype.emptyFunction;
+this.options.onComplete = (function(transport, param) {
+this.updateContent();
+onComplete(transport, param);
+}).bind(this);
+
+this.request(url);
+},
+
+updateContent: function() {
+var receiver = this.container[this.success() ? 'success' : 'failure'];
+var response = this.transport.responseText;
+
+if (!this.options.evalScripts) response = response.stripScripts();
+
+if (receiver = $(receiver)) {
+if (this.options.insertion)
+new this.options.insertion(receiver, response);
+else
+receiver.update(response);
+}
+
+if (this.success()) {
+if (this.onComplete)
+setTimeout(this.onComplete.bind(this), 10);
+}
+}
+});
+
+Ajax.PeriodicalUpdater = Class.create();
+Ajax.PeriodicalUpdater.prototype = Object.extend(new Ajax.Base(), {
+initialize: function(container, url, options) {
+this.setOptions(options);
+this.onComplete = this.options.onComplete;
+
+this.frequency = (this.options.frequency || 2);
+this.decay = (this.options.decay || 1);
+
+this.updater = {};
+this.container = container;
+this.url = url;
+
+this.start();
+},
+
+start: function() {
+this.options.onComplete = this.updateComplete.bind(this);
+this.onTimerEvent();
+},
+
+stop: function() {
+this.updater.options.onComplete = undefined;
+clearTimeout(this.timer);
+(this.onComplete || Prototype.emptyFunction).apply(this, arguments);
+},
+
+updateComplete: function(request) {
+if (this.options.decay) {
+this.decay = (request.responseText == this.lastText ?
+this.decay * this.options.decay : 1);
+
+this.lastText = request.responseText;
+}
+this.timer = setTimeout(this.onTimerEvent.bind(this),
+this.decay * this.frequency * 1000);
+},
+
+onTimerEvent: function() {
+this.updater = new Ajax.Updater(this.container, this.url, this.options);
+}
+});
+function $(element) {
+if (arguments.length > 1) {
+for (var i = 0, elements = [], length = arguments.length; i < length; i++)
+elements.push($(arguments[i]));
+return elements;
+}
+if (typeof element == 'string')
+element = document.getElementById(element);
+return Element.extend(element);
+}
+
+if (Prototype.BrowserFeatures.XPath) {
+document._getElementsByXPath = function(expression, parentElement) {
+var results = [];
+var query = document.evaluate(expression, $(parentElement) || document,
+null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+for (var i = 0, length = query.snapshotLength; i < length; i++)
+results.push(query.snapshotItem(i));
+return results;
+};
+}
+
+document.getElementsByClassName = function(className, parentElement) {
+if (Prototype.BrowserFeatures.XPath) {
+var q = ".//*[contains(concat(' ', @class, ' '), ' " + className + " ')]";
+return document._getElementsByXPath(q, parentElement);
+} else {
+var children = ($(parentElement) || document.body).getElementsByTagName('*');
+var elements = [], child;
+for (var i = 0, length = children.length; i < length; i++) {
+child = children[i];
+if (Element.hasClassName(child, className))
+elements.push(Element.extend(child));
+}
+return elements;
+}
+};
+
+
+
+if (!window.Element)
+var Element = new Object();
+
+Element.extend = function(element) {
+if (!element || _nativeExtensions || element.nodeType == 3) return element;
+
+if (!element._extended && element.tagName && element != window) {
+var methods = Object.clone(Element.Methods), cache = Element.extend.cache;
+
+if (element.tagName == 'FORM')
+Object.extend(methods, Form.Methods);
+if (['INPUT', 'TEXTAREA', 'SELECT'].include(element.tagName))
+Object.extend(methods, Form.Element.Methods);
+
+Object.extend(methods, Element.Methods.Simulated);
+
+for (var property in methods) {
+var value = methods[property];
+if (typeof value == 'function' && !(property in element))
+element[property] = cache.findOrStore(value);
+}
+}
+
+element._extended = true;
+return element;
+};
+
+Element.extend.cache = {
+findOrStore: function(value) {
+return this[value] = this[value] || function() {
+return value.apply(null, [this].concat($A(arguments)));
+}
+}
+};
+
+Element.Methods = {
+visible: function(element) {
+return $(element).style.display != 'none';
+},
+
+toggle: function(element) {
+element = $(element);
+Element[Element.visible(element) ? 'hide' : 'show'](element);
+return element;
+},
+
+hide: function(element) {
+$(element).style.display = 'none';
+return element;
+},
+
+show: function(element) {
+$(element).style.display = '';
+return element;
+},
+
+remove: function(element) {
+element = $(element);
+element.parentNode.removeChild(element);
+return element;
+},
+
+update: function(element, html) {
+html = typeof html == 'undefined' ? '' : html.toString();
+$(element).innerHTML = html.stripScripts();
+setTimeout(function() {html.evalScripts()}, 10);
+return element;
+},
+
+replace: function(element, html) {
+element = $(element);
+html = typeof html == 'undefined' ? '' : html.toString();
+if (element.outerHTML) {
+element.outerHTML = html.stripScripts();
+} else {
+var range = element.ownerDocument.createRange();
+range.selectNodeContents(element);
+element.parentNode.replaceChild(
+range.createContextualFragment(html.stripScripts()), element);
+}
+setTimeout(function() {html.evalScripts()}, 10);
+return element;
+},
+
+inspect: function(element) {
+element = $(element);
+var result = '<' + element.tagName.toLowerCase();
+$H({'id': 'id', 'className': 'class'}).each(function(pair) {
+var property = pair.first(), attribute = pair.last();
+var value = (element[property] || '').toString();
+if (value) result += ' ' + attribute + '=' + value.inspect(true);
+});
+return result + '>';
+},
+
+recursivelyCollect: function(element, property) {
+element = $(element);
+var elements = [];
+while (element = element[property])
+if (element.nodeType == 1)
+elements.push(Element.extend(element));
+return elements;
+},
+
+ancestors: function(element) {
+return $(element).recursivelyCollect('parentNode');
+},
+
+descendants: function(element) {
+return $A($(element).getElementsByTagName('*'));
+},
+
+immediateDescendants: function(element) {
+if (!(element = $(element).firstChild)) return [];
+while (element && element.nodeType != 1) element = element.nextSibling;
+if (element) return [element].concat($(element).nextSiblings());
+return [];
+},
+
+previousSiblings: function(element) {
+return $(element).recursivelyCollect('previousSibling');
+},
+
+nextSiblings: function(element) {
+return $(element).recursivelyCollect('nextSibling');
+},
+
+siblings: function(element) {
+element = $(element);
+return element.previousSiblings().reverse().concat(element.nextSiblings());
+},
+
+match: function(element, selector) {
+if (typeof selector == 'string')
+selector = new Selector(selector);
+return selector.match($(element));
+},
+
+up: function(element, expression, index) {
+return Selector.findElement($(element).ancestors(), expression, index);
+},
+
+down: function(element, expression, index) {
+return Selector.findElement($(element).descendants(), expression, index);
+},
+
+previous: function(element, expression, index) {
+return Selector.findElement($(element).previousSiblings(), expression, index);
+},
+
+next: function(element, expression, index) {
+return Selector.findElement($(element).nextSiblings(), expression, index);
+},
+
+getElementsBySelector: function() {
+var args = $A(arguments), element = $(args.shift());
+return Selector.findChildElements(element, args);
+},
+
+getElementsByClassName: function(element, className) {
+return document.getElementsByClassName(className, element);
+},
+
+readAttribute: function(element, name) {
+element = $(element);
+if (document.all && !window.opera) {
+var t = Element._attributeTranslations;
+if (t.values[name]) return t.values[name](element, name);
+if (t.names[name])  name = t.names[name];
+var attribute = element.attributes[name];
+if(attribute) return attribute.nodeValue;
+}
+return element.getAttribute(name);
+},
+
+getHeight: function(element) {
+return $(element).getDimensions().height;
+},
+
+getWidth: function(element) {
+return $(element).getDimensions().width;
+},
+
+classNames: function(element) {
+return new Element.ClassNames(element);
+},
+
+hasClassName: function(element, className) {
+if (!(element = $(element))) return;
+var elementClassName = element.className;
+if (elementClassName.length == 0) return false;
+if (elementClassName == className ||
+elementClassName.match(new RegExp("(^|\\s)" + className + "(\\s|$)")))
+return true;
+return false;
+},
+
+addClassName: function(element, className) {
+if (!(element = $(element))) return;
+Element.classNames(element).add(className);
+return element;
+},
+
+removeClassName: function(element, className) {
+if (!(element = $(element))) return;
+Element.classNames(element).remove(className);
+return element;
+},
+
+toggleClassName: function(element, className) {
+if (!(element = $(element))) return;
+Element.classNames(element)[element.hasClassName(className) ? 'remove' : 'add'](className);
+return element;
+},
+
+observe: function() {
+Event.observe.apply(Event, arguments);
+return $A(arguments).first();
+},
+
+stopObserving: function() {
+Event.stopObserving.apply(Event, arguments);
+return $A(arguments).first();
+},
+
+
+cleanWhitespace: function(element) {
+element = $(element);
+var node = element.firstChild;
+while (node) {
+var nextNode = node.nextSibling;
+if (node.nodeType == 3 && !/\S/.test(node.nodeValue))
+element.removeChild(node);
+node = nextNode;
+}
+return element;
+},
+
+empty: function(element) {
+return $(element).innerHTML.match(/^\s*$/);
+},
+
+descendantOf: function(element, ancestor) {
+element = $(element), ancestor = $(ancestor);
+while (element = element.parentNode)
+if (element == ancestor) return true;
+return false;
+},
+
+scrollTo: function(element) {
+element = $(element);
+var pos = Position.cumulativeOffset(element);
+window.scrollTo(pos[0], pos[1]);
+return element;
+},
+
+getStyle: function(element, style) {
+element = $(element);
+if (['float','cssFloat'].include(style))
+style = (typeof element.style.styleFloat != 'undefined' ? 'styleFloat' : 'cssFloat');
+style = style.camelize();
+var value = element.style[style];
+if (!value) {
+if (document.defaultView && document.defaultView.getComputedStyle) {
+var css = document.defaultView.getComputedStyle(element, null);
+value = css ? css[style] : null;
+} else if (element.currentStyle) {
+value = element.currentStyle[style];
+}
+}
+
+if((value == 'auto') && ['width','height'].include(style) && (element.getStyle('display') != 'none'))
+value = element['offset'+style.capitalize()] + 'px';
+
+if (window.opera && ['left', 'top', 'right', 'bottom'].include(style))
+if (Element.getStyle(element, 'position') == 'static') value = 'auto';
+if(style == 'opacity') {
+if(value) return parseFloat(value);
+if(value = (element.getStyle('filter') || '').match(/alpha\(opacity=(.*)\)/))
+if(value[1]) return parseFloat(value[1]) / 100;
+return 1.0;
+}
+return value == 'auto' ? null : value;
+},
+
+setStyle: function(element, style) {
+element = $(element);
+for (var name in style) {
+var value = style[name];
+if(name == 'opacity') {
+if (value == 1) {
+value = (/Gecko/.test(navigator.userAgent) &&
+!/Konqueror|Safari|KHTML/.test(navigator.userAgent)) ? 0.999999 : 1.0;
+if(/MSIE/.test(navigator.userAgent) && !window.opera)
+element.style.filter = element.getStyle('filter').replace(/alpha\([^\)]*\)/gi,'');
+} else if(value == '') {
+if(/MSIE/.test(navigator.userAgent) && !window.opera)
+element.style.filter = element.getStyle('filter').replace(/alpha\([^\)]*\)/gi,'');
+} else {
+if(value < 0.00001) value = 0;
+if(/MSIE/.test(navigator.userAgent) && !window.opera)
+element.style.filter = element.getStyle('filter').replace(/alpha\([^\)]*\)/gi,'') +
+'alpha(opacity='+value*100+')';
+}
+} else if(['float','cssFloat'].include(name)) name = (typeof element.style.styleFloat != 'undefined') ? 'styleFloat' : 'cssFloat';
+element.style[name.camelize()] = value;
+}
+return element;
+},
+
+getDimensions: function(element) {
+element = $(element);
+var display = $(element).getStyle('display');
+if (display != 'none' && display != null) // Safari bug
+return {width: element.offsetWidth, height: element.offsetHeight};
+
+
+
+var els = element.style;
+var originalVisibility = els.visibility;
+var originalPosition = els.position;
+var originalDisplay = els.display;
+els.visibility = 'hidden';
+els.position = 'absolute';
+els.display = 'block';
+var originalWidth = element.clientWidth;
+var originalHeight = element.clientHeight;
+els.display = originalDisplay;
+els.position = originalPosition;
+els.visibility = originalVisibility;
+return {width: originalWidth, height: originalHeight};
+},
+
+makePositioned: function(element) {
+element = $(element);
+var pos = Element.getStyle(element, 'position');
+if (pos == 'static' || !pos) {
+element._madePositioned = true;
+element.style.position = 'relative';
+
+
+if (window.opera) {
+element.style.top = 0;
+element.style.left = 0;
+}
+}
+return element;
+},
+
+undoPositioned: function(element) {
+element = $(element);
+if (element._madePositioned) {
+element._madePositioned = undefined;
+element.style.position =
+element.style.top =
+element.style.left =
+element.style.bottom =
+element.style.right = '';
+}
+return element;
+},
+
+makeClipping: function(element) {
+element = $(element);
+if (element._overflow) return element;
+element._overflow = element.style.overflow || 'auto';
+if ((Element.getStyle(element, 'overflow') || 'visible') != 'hidden')
+element.style.overflow = 'hidden';
+return element;
+},
+
+undoClipping: function(element) {
+element = $(element);
+if (!element._overflow) return element;
+element.style.overflow = element._overflow == 'auto' ? '' : element._overflow;
+element._overflow = null;
+return element;
+}
+};
+
+Object.extend(Element.Methods, {childOf: Element.Methods.descendantOf});
+
+Element._attributeTranslations = {};
+
+Element._attributeTranslations.names = {
+colspan:   "colSpan",
+rowspan:   "rowSpan",
+valign:    "vAlign",
+datetime:  "dateTime",
+accesskey: "accessKey",
+tabindex:  "tabIndex",
+enctype:   "encType",
+maxlength: "maxLength",
+readonly:  "readOnly",
+longdesc:  "longDesc"
+};
+
+Element._attributeTranslations.values = {
+_getAttr: function(element, attribute) {
+return element.getAttribute(attribute, 2);
+},
+
+_flag: function(element, attribute) {
+return $(element).hasAttribute(attribute) ? attribute : null;
+},
+
+style: function(element) {
+return element.style.cssText.toLowerCase();
+},
+
+title: function(element) {
+var node = element.getAttributeNode('title');
+return node.specified ? node.nodeValue : null;
+}
+};
+
+Object.extend(Element._attributeTranslations.values, {
+href: Element._attributeTranslations.values._getAttr,
+src:  Element._attributeTranslations.values._getAttr,
+disabled: Element._attributeTranslations.values._flag,
+checked:  Element._attributeTranslations.values._flag,
+readonly: Element._attributeTranslations.values._flag,
+multiple: Element._attributeTranslations.values._flag
+});
+
+Element.Methods.Simulated = {
+hasAttribute: function(element, attribute) {
+var t = Element._attributeTranslations;
+attribute = t.names[attribute] || attribute;
+return $(element).getAttributeNode(attribute).specified;
+}
+};
+
+
+if (document.all && !window.opera){
+Element.Methods.update = function(element, html) {
+element = $(element);
+html = typeof html == 'undefined' ? '' : html.toString();
+var tagName = element.tagName.toUpperCase();
+if (['THEAD','TBODY','TR','TD'].include(tagName)) {
+var div = document.createElement('div');
+switch (tagName) {
+case 'THEAD':
+case 'TBODY':
+div.innerHTML = '<table><tbody>' +  html.stripScripts() + '</tbody></table>';
+depth = 2;
+break;
+case 'TR':
+div.innerHTML = '<table><tbody><tr>' +  html.stripScripts() + '</tr></tbody></table>';
+depth = 3;
+break;
+case 'TD':
+div.innerHTML = '<table><tbody><tr><td>' +  html.stripScripts() + '</td></tr></tbody></table>';
+depth = 4;
+}
+$A(element.childNodes).each(function(node){
+element.removeChild(node)
+});
+depth.times(function(){ div = div.firstChild });
+
+$A(div.childNodes).each(
+function(node){ element.appendChild(node) });
+} else {
+element.innerHTML = html.stripScripts();
+}
+setTimeout(function() {html.evalScripts()}, 10);
+return element;
+}
+};
+
+Object.extend(Element, Element.Methods);
+
+var _nativeExtensions = false;
+
+if(/Konqueror|Safari|KHTML/.test(navigator.userAgent))
+['', 'Form', 'Input', 'TextArea', 'Select'].each(function(tag) {
+var className = 'HTML' + tag + 'Element';
+if(window[className]) return;
+var klass = window[className] = {};
+klass.prototype = document.createElement(tag ? tag.toLowerCase() : 'div').__proto__;
+});
+
+Element.addMethods = function(methods) {
+Object.extend(Element.Methods, methods || {});
+
+function copy(methods, destination, onlyIfAbsent) {
+onlyIfAbsent = onlyIfAbsent || false;
+var cache = Element.extend.cache;
+for (var property in methods) {
+var value = methods[property];
+if (!onlyIfAbsent || !(property in destination))
+destination[property] = cache.findOrStore(value);
+}
+}
+
+if (typeof HTMLElement != 'undefined') {
+copy(Element.Methods, HTMLElement.prototype);
+copy(Element.Methods.Simulated, HTMLElement.prototype, true);
+copy(Form.Methods, HTMLFormElement.prototype);
+[HTMLInputElement, HTMLTextAreaElement, HTMLSelectElement].each(function(klass) {
+copy(Form.Element.Methods, klass.prototype);
+});
+_nativeExtensions = true;
+}
+}
+
+var Toggle = new Object();
+Toggle.display = Element.toggle;
+
+
+
+Abstract.Insertion = function(adjacency) {
+this.adjacency = adjacency;
+}
+
+Abstract.Insertion.prototype = {
+initialize: function(element, content) {
+this.element = $(element);
+this.content = content.stripScripts();
+
+if (this.adjacency && this.element.insertAdjacentHTML) {
+try {
+this.element.insertAdjacentHTML(this.adjacency, this.content);
+} catch (e) {
+var tagName = this.element.tagName.toUpperCase();
+if (['TBODY', 'TR'].include(tagName)) {
+this.insertContent(this.contentFromAnonymousTable());
+} else {
+throw e;
+}
+}
+} else {
+this.range = this.element.ownerDocument.createRange();
+if (this.initializeRange) this.initializeRange();
+this.insertContent([this.range.createContextualFragment(this.content)]);
+}
+
+setTimeout(function() {content.evalScripts()}, 10);
+},
+
+contentFromAnonymousTable: function() {
+var div = document.createElement('div');
+div.innerHTML = '<table><tbody>' + this.content + '</tbody></table>';
+return $A(div.childNodes[0].childNodes[0].childNodes);
+}
+}
+
+var Insertion = new Object();
+
+Insertion.Before = Class.create();
+Insertion.Before.prototype = Object.extend(new Abstract.Insertion('beforeBegin'), {
+initializeRange: function() {
+this.range.setStartBefore(this.element);
+},
+
+insertContent: function(fragments) {
+fragments.each((function(fragment) {
+this.element.parentNode.insertBefore(fragment, this.element);
+}).bind(this));
+}
+});
+
+Insertion.Top = Class.create();
+Insertion.Top.prototype = Object.extend(new Abstract.Insertion('afterBegin'), {
+initializeRange: function() {
+this.range.selectNodeContents(this.element);
+this.range.collapse(true);
+},
+
+insertContent: function(fragments) {
+fragments.reverse(false).each((function(fragment) {
+this.element.insertBefore(fragment, this.element.firstChild);
+}).bind(this));
+}
+});
+
+Insertion.Bottom = Class.create();
+Insertion.Bottom.prototype = Object.extend(new Abstract.Insertion('beforeEnd'), {
+initializeRange: function() {
+this.range.selectNodeContents(this.element);
+this.range.collapse(this.element);
+},
+
+insertContent: function(fragments) {
+fragments.each((function(fragment) {
+this.element.appendChild(fragment);
+}).bind(this));
+}
+});
+
+Insertion.After = Class.create();
+Insertion.After.prototype = Object.extend(new Abstract.Insertion('afterEnd'), {
+initializeRange: function() {
+this.range.setStartAfter(this.element);
+},
+
+insertContent: function(fragments) {
+fragments.each((function(fragment) {
+this.element.parentNode.insertBefore(fragment,
+this.element.nextSibling);
+}).bind(this));
+}
+});
+
+
+
+Element.ClassNames = Class.create();
+Element.ClassNames.prototype = {
+initialize: function(element) {
+this.element = $(element);
+},
+
+_each: function(iterator) {
+this.element.className.split(/\s+/).select(function(name) {
+return name.length > 0;
+})._each(iterator);
+},
+
+set: function(className) {
+this.element.className = className;
+},
+
+add: function(classNameToAdd) {
+if (this.include(classNameToAdd)) return;
+this.set($A(this).concat(classNameToAdd).join(' '));
+},
+
+remove: function(classNameToRemove) {
+if (!this.include(classNameToRemove)) return;
+this.set($A(this).without(classNameToRemove).join(' '));
+},
+
+toString: function() {
+return $A(this).join(' ');
+}
+};
+
+Object.extend(Element.ClassNames.prototype, Enumerable);
+var Selector = Class.create();
+Selector.prototype = {
+initialize: function(expression) {
+this.params = {classNames: []};
+this.expression = expression.toString().strip();
+this.parseExpression();
+this.compileMatcher();
+},
+
+parseExpression: function() {
+function abort(message) { throw 'Parse error in selector: ' + message; }
+
+if (this.expression == '')  abort('empty expression');
+
+var params = this.params, expr = this.expression, match, modifier, clause, rest;
+while (match = expr.match(/^(.*)\[([a-z0-9_:-]+?)(?:([~\|!]?=)(?:"([^"]*)"|([^\]\s]*)))?\]$/i)) {
+params.attributes = params.attributes || [];
+params.attributes.push({name: match[2], operator: match[3], value: match[4] || match[5] || ''});
+expr = match[1];
+}
+
+if (expr == '*') return this.params.wildcard = true;
+
+while (match = expr.match(/^([^a-z0-9_-])?([a-z0-9_-]+)(.*)/i)) {
+modifier = match[1], clause = match[2], rest = match[3];
+switch (modifier) {
+case '#':       params.id = clause; break;
+case '.':       params.classNames.push(clause); break;
+case '':
+case undefined: params.tagName = clause.toUpperCase(); break;
+default:        abort(expr.inspect());
+}
+expr = rest;
+}
+
+if (expr.length > 0) abort(expr.inspect());
+},
+
+buildMatchExpression: function() {
+var params = this.params, conditions = [], clause;
+
+if (params.wildcard)
+conditions.push('true');
+if (clause = params.id)
+conditions.push('element.readAttribute("id") == ' + clause.inspect());
+if (clause = params.tagName)
+conditions.push('element.tagName.toUpperCase() == ' + clause.inspect());
+if ((clause = params.classNames).length > 0)
+for (var i = 0, length = clause.length; i < length; i++)
+conditions.push('element.hasClassName(' + clause[i].inspect() + ')');
+if (clause = params.attributes) {
+clause.each(function(attribute) {
+var value = 'element.readAttribute(' + attribute.name.inspect() + ')';
+var splitValueBy = function(delimiter) {
+return value + ' && ' + value + '.split(' + delimiter.inspect() + ')';
+}
+
+switch (attribute.operator) {
+case '=':       conditions.push(value + ' == ' + attribute.value.inspect()); break;
+case '~=':      conditions.push(splitValueBy(' ') + '.include(' + attribute.value.inspect() + ')'); break;
+case '|=':      conditions.push(
+splitValueBy('-') + '.first().toUpperCase() == ' + attribute.value.toUpperCase().inspect()
+); break;
+case '!=':      conditions.push(value + ' != ' + attribute.value.inspect()); break;
+case '':
+case undefined: conditions.push('element.hasAttribute(' + attribute.name.inspect() + ')'); break;
+default:        throw 'Unknown operator ' + attribute.operator + ' in selector';
+}
+});
+}
+
+return conditions.join(' && ');
+},
+
+compileMatcher: function() {
+this.match = new Function('element', 'if (!element.tagName) return false; \
+element = $(element); \
+return ' + this.buildMatchExpression());
+},
+
+findElements: function(scope) {
+var element;
+
+if (element = $(this.params.id))
+if (this.match(element))
+if (!scope || Element.childOf(element, scope))
+return [element];
+
+scope = (scope || document).getElementsByTagName(this.params.tagName || '*');
+
+var results = [];
+for (var i = 0, length = scope.length; i < length; i++)
+if (this.match(element = scope[i]))
+results.push(Element.extend(element));
+
+return results;
+},
+
+toString: function() {
+return this.expression;
+}
+}
+
+Object.extend(Selector, {
+matchElements: function(elements, expression) {
+var selector = new Selector(expression);
+return elements.select(selector.match.bind(selector)).map(Element.extend);
+},
+
+findElement: function(elements, expression, index) {
+if (typeof expression == 'number') index = expression, expression = false;
+return Selector.matchElements(elements, expression || '*')[index || 0];
+},
+
+findChildElements: function(element, expressions) {
+return expressions.map(function(expression) {
+return expression.match(/[^\s"]+(?:"[^"]*"[^\s"]+)*/g).inject([null], function(results, expr) {
+var selector = new Selector(expr);
+return results.inject([], function(elements, result) {
+return elements.concat(selector.findElements(result || element));
+});
+});
+}).flatten();
+}
+});
+
+function $$() {
+return Selector.findChildElements(document, $A(arguments));
+}
+var Form = {
+reset: function(form) {
+$(form).reset();
+return form;
+},
+
+serializeElements: function(elements, getHash) {
+var data = elements.inject({}, function(result, element) {
+if (!element.disabled && element.name) {
+var key = element.name, value = $(element).getValue();
+if (value != undefined) {
+if (result[key]) {
+if (result[key].constructor != Array) result[key] = [result[key]];
+result[key].push(value);
+}
+else result[key] = value;
+}
+}
+return result;
+});
+
+return getHash ? data : Hash.toQueryString(data);
+}
+};
+
+Form.Methods = {
+serialize: function(form, getHash) {
+return Form.serializeElements(Form.getElements(form), getHash);
+},
+
+getElements: function(form) {
+return $A($(form).getElementsByTagName('*')).inject([],
+function(elements, child) {
+if (Form.Element.Serializers[child.tagName.toLowerCase()])
+elements.push(Element.extend(child));
+return elements;
+}
+);
+},
+
+getInputs: function(form, typeName, name) {
+form = $(form);
+var inputs = form.getElementsByTagName('input');
+
+if (!typeName && !name) return $A(inputs).map(Element.extend);
+
+for (var i = 0, matchingInputs = [], length = inputs.length; i < length; i++) {
+var input = inputs[i];
+if ((typeName && input.type != typeName) || (name && input.name != name))
+continue;
+matchingInputs.push(Element.extend(input));
+}
+
+return matchingInputs;
+},
+
+disable: function(form) {
+form = $(form);
+form.getElements().each(function(element) {
+element.blur();
+element.disabled = 'true';
+});
+return form;
+},
+
+enable: function(form) {
+form = $(form);
+form.getElements().each(function(element) {
+element.disabled = '';
+});
+return form;
+},
+
+findFirstElement: function(form) {
+return $(form).getElements().find(function(element) {
+return element.type != 'hidden' && !element.disabled &&
+['input', 'select', 'textarea'].include(element.tagName.toLowerCase());
+});
+},
+
+focusFirstElement: function(form) {
+form = $(form);
+form.findFirstElement().activate();
+return form;
+}
+}
+
+Object.extend(Form, Form.Methods);
+
+
+
+Form.Element = {
+focus: function(element) {
+$(element).focus();
+return element;
+},
+
+select: function(element) {
+$(element).select();
+return element;
+}
+}
+
+Form.Element.Methods = {
+serialize: function(element) {
+element = $(element);
+if (!element.disabled && element.name) {
+var value = element.getValue();
+if (value != undefined) {
+var pair = {};
+pair[element.name] = value;
+return Hash.toQueryString(pair);
+}
+}
+return '';
+},
+
+getValue: function(element) {
+element = $(element);
+var method = element.tagName.toLowerCase();
+return Form.Element.Serializers[method](element);
+},
+
+clear: function(element) {
+$(element).value = '';
+return element;
+},
+
+present: function(element) {
+return $(element).value != '';
+},
+
+activate: function(element) {
+element = $(element);
+element.focus();
+if (element.select && ( element.tagName.toLowerCase() != 'input' ||
+!['button', 'reset', 'submit'].include(element.type) ) )
+element.select();
+return element;
+},
+
+disable: function(element) {
+element = $(element);
+element.disabled = true;
+return element;
+},
+
+enable: function(element) {
+element = $(element);
+element.blur();
+element.disabled = false;
+return element;
+}
+}
+
+Object.extend(Form.Element, Form.Element.Methods);
+var Field = Form.Element;
+var $F = Form.Element.getValue;
+
+
+
+Form.Element.Serializers = {
+input: function(element) {
+switch (element.type.toLowerCase()) {
+case 'checkbox':
+case 'radio':
+return Form.Element.Serializers.inputSelector(element);
+default:
+return Form.Element.Serializers.textarea(element);
+}
+},
+
+inputSelector: function(element) {
+return element.checked ? element.value : null;
+},
+
+textarea: function(element) {
+return element.value;
+},
+
+select: function(element) {
+return this[element.type == 'select-one' ?
+'selectOne' : 'selectMany'](element);
+},
+
+selectOne: function(element) {
+var index = element.selectedIndex;
+return index >= 0 ? this.optionValue(element.options[index]) : null;
+},
+
+selectMany: function(element) {
+var values, length = element.length;
+if (!length) return null;
+
+for (var i = 0, values = []; i < length; i++) {
+var opt = element.options[i];
+if (opt.selected) values.push(this.optionValue(opt));
+}
+return values;
+},
+
+optionValue: function(opt) {
+
+return Element.extend(opt).hasAttribute('value') ? opt.value : opt.text;
+}
+}
+
+
+
+Abstract.TimedObserver = function() {}
+Abstract.TimedObserver.prototype = {
+initialize: function(element, frequency, callback) {
+this.frequency = frequency;
+this.element   = $(element);
+this.callback  = callback;
+
+this.lastValue = this.getValue();
+this.registerCallback();
+},
+
+registerCallback: function() {
+setInterval(this.onTimerEvent.bind(this), this.frequency * 1000);
+},
+
+onTimerEvent: function() {
+var value = this.getValue();
+var changed = ('string' == typeof this.lastValue && 'string' == typeof value
+? this.lastValue != value : String(this.lastValue) != String(value));
+if (changed) {
+this.callback(this.element, value);
+this.lastValue = value;
+}
+}
+}
+
+Form.Element.Observer = Class.create();
+Form.Element.Observer.prototype = Object.extend(new Abstract.TimedObserver(), {
+getValue: function() {
+return Form.Element.getValue(this.element);
+}
+});
+
+Form.Observer = Class.create();
+Form.Observer.prototype = Object.extend(new Abstract.TimedObserver(), {
+getValue: function() {
+return Form.serialize(this.element);
+}
+});
+
+
+
+Abstract.EventObserver = function() {}
+Abstract.EventObserver.prototype = {
+initialize: function(element, callback) {
+this.element  = $(element);
+this.callback = callback;
+
+this.lastValue = this.getValue();
+if (this.element.tagName.toLowerCase() == 'form')
+this.registerFormCallbacks();
+else
+this.registerCallback(this.element);
+},
+
+onElementEvent: function() {
+var value = this.getValue();
+if (this.lastValue != value) {
+this.callback(this.element, value);
+this.lastValue = value;
+}
+},
+
+registerFormCallbacks: function() {
+Form.getElements(this.element).each(this.registerCallback.bind(this));
+},
+
+registerCallback: function(element) {
+if (element.type) {
+switch (element.type.toLowerCase()) {
+case 'checkbox':
+case 'radio':
+Event.observe(element, 'click', this.onElementEvent.bind(this));
+break;
+default:
+Event.observe(element, 'change', this.onElementEvent.bind(this));
+break;
+}
+}
+}
+}
+
+Form.Element.EventObserver = Class.create();
+Form.Element.EventObserver.prototype = Object.extend(new Abstract.EventObserver(), {
+getValue: function() {
+return Form.Element.getValue(this.element);
+}
+});
+
+Form.EventObserver = Class.create();
+Form.EventObserver.prototype = Object.extend(new Abstract.EventObserver(), {
+getValue: function() {
+return Form.serialize(this.element);
+}
+});
+if (!window.Event) {
+var Event = new Object();
+}
+
+Object.extend(Event, {
+KEY_BACKSPACE: 8,
+KEY_TAB:       9,
+KEY_RETURN:   13,
+KEY_ESC:      27,
+KEY_LEFT:     37,
+KEY_UP:       38,
+KEY_RIGHT:    39,
+KEY_DOWN:     40,
+KEY_DELETE:   46,
+KEY_HOME:     36,
+KEY_END:      35,
+KEY_PAGEUP:   33,
+KEY_PAGEDOWN: 34,
+
+element: function(event) {
+return event.target || event.srcElement;
+},
+
+isLeftClick: function(event) {
+return (((event.which) && (event.which == 1)) ||
+((event.button) && (event.button == 1)));
+},
+
+pointerX: function(event) {
+return event.pageX || (event.clientX +
+(document.documentElement.scrollLeft || document.body.scrollLeft));
+},
+
+pointerY: function(event) {
+return event.pageY || (event.clientY +
+(document.documentElement.scrollTop || document.body.scrollTop));
+},
+
+stop: function(event) {
+if (event.preventDefault) {
+event.preventDefault();
+event.stopPropagation();
+} else {
+event.returnValue = false;
+event.cancelBubble = true;
+}
+},
+
+
+
+findElement: function(event, tagName) {
+var element = Event.element(event);
+while (element.parentNode && (!element.tagName ||
+(element.tagName.toUpperCase() != tagName.toUpperCase())))
+element = element.parentNode;
+return element;
+},
+
+observers: false,
+
+_observeAndCache: function(element, name, observer, useCapture) {
+if (!this.observers) this.observers = [];
+if (element.addEventListener) {
+this.observers.push([element, name, observer, useCapture]);
+element.addEventListener(name, observer, useCapture);
+} else if (element.attachEvent) {
+this.observers.push([element, name, observer, useCapture]);
+element.attachEvent('on' + name, observer);
+}
+},
+
+unloadCache: function() {
+if (!Event.observers) return;
+for (var i = 0, length = Event.observers.length; i < length; i++) {
+Event.stopObserving.apply(this, Event.observers[i]);
+Event.observers[i][0] = null;
+}
+Event.observers = false;
+},
+
+observe: function(element, name, observer, useCapture) {
+element = $(element);
+useCapture = useCapture || false;
+
+if (name == 'keypress' &&
+(navigator.appVersion.match(/Konqueror|Safari|KHTML/)
+|| element.attachEvent))
+name = 'keydown';
+
+Event._observeAndCache(element, name, observer, useCapture);
+},
+
+stopObserving: function(element, name, observer, useCapture) {
+element = $(element);
+useCapture = useCapture || false;
+
+if (name == 'keypress' &&
+(navigator.appVersion.match(/Konqueror|Safari|KHTML/)
+|| element.detachEvent))
+name = 'keydown';
+
+if (element.removeEventListener) {
+element.removeEventListener(name, observer, useCapture);
+} else if (element.detachEvent) {
+try {
+element.detachEvent('on' + name, observer);
+} catch (e) {}
+}
+}
+});
+
+
+if (navigator.appVersion.match(/\bMSIE\b/))
+Event.observe(window, 'unload', Event.unloadCache, false);
+var Position = {
+
+
+
+includeScrollOffsets: false,
+
+
+
+prepare: function() {
+this.deltaX =  window.pageXOffset
+|| document.documentElement.scrollLeft
+|| document.body.scrollLeft
+|| 0;
+this.deltaY =  window.pageYOffset
+|| document.documentElement.scrollTop
+|| document.body.scrollTop
+|| 0;
+},
+
+realOffset: function(element) {
+var valueT = 0, valueL = 0;
+do {
+valueT += element.scrollTop  || 0;
+valueL += element.scrollLeft || 0;
+element = element.parentNode;
+} while (element);
+return [valueL, valueT];
+},
+
+cumulativeOffset: function(element) {
+var valueT = 0, valueL = 0;
+do {
+valueT += element.offsetTop  || 0;
+valueL += element.offsetLeft || 0;
+element = element.offsetParent;
+} while (element);
+return [valueL, valueT];
+},
+
+positionedOffset: function(element) {
+var valueT = 0, valueL = 0;
+do {
+valueT += element.offsetTop  || 0;
+valueL += element.offsetLeft || 0;
+element = element.offsetParent;
+if (element) {
+if(element.tagName=='BODY') break;
+var p = Element.getStyle(element, 'position');
+if (p == 'relative' || p == 'absolute') break;
+}
+} while (element);
+return [valueL, valueT];
+},
+
+offsetParent: function(element) {
+if (element.offsetParent) return element.offsetParent;
+if (element == document.body) return element;
+
+while ((element = element.parentNode) && element != document.body)
+if (Element.getStyle(element, 'position') != 'static')
+return element;
+
+return document.body;
+},
+
+
+within: function(element, x, y) {
+if (this.includeScrollOffsets)
+return this.withinIncludingScrolloffsets(element, x, y);
+this.xcomp = x;
+this.ycomp = y;
+this.offset = this.cumulativeOffset(element);
+
+return (y >= this.offset[1] &&
+y <  this.offset[1] + element.offsetHeight &&
+x >= this.offset[0] &&
+x <  this.offset[0] + element.offsetWidth);
+},
+
+withinIncludingScrolloffsets: function(element, x, y) {
+var offsetcache = this.realOffset(element);
+
+this.xcomp = x + offsetcache[0] - this.deltaX;
+this.ycomp = y + offsetcache[1] - this.deltaY;
+this.offset = this.cumulativeOffset(element);
+
+return (this.ycomp >= this.offset[1] &&
+this.ycomp <  this.offset[1] + element.offsetHeight &&
+this.xcomp >= this.offset[0] &&
+this.xcomp <  this.offset[0] + element.offsetWidth);
+},
+
+
+overlap: function(mode, element) {
+if (!mode) return 0;
+if (mode == 'vertical')
+return ((this.offset[1] + element.offsetHeight) - this.ycomp) /
+element.offsetHeight;
+if (mode == 'horizontal')
+return ((this.offset[0] + element.offsetWidth) - this.xcomp) /
+element.offsetWidth;
+},
+
+page: function(forElement) {
+var valueT = 0, valueL = 0;
+
+var element = forElement;
+do {
+valueT += element.offsetTop  || 0;
+valueL += element.offsetLeft || 0;
+
+
+if (element.offsetParent==document.body)
+if (Element.getStyle(element,'position')=='absolute') break;
+
+} while (element = element.offsetParent);
+
+element = forElement;
+do {
+if (!window.opera || element.tagName=='BODY') {
+valueT -= element.scrollTop  || 0;
+valueL -= element.scrollLeft || 0;
+}
+} while (element = element.parentNode);
+
+return [valueL, valueT];
+},
+
+clone: function(source, target) {
+var options = Object.extend({
+setLeft:    true,
+setTop:     true,
+setWidth:   true,
+setHeight:  true,
+offsetTop:  0,
+offsetLeft: 0
+}, arguments[2] || {})
+
+
+source = $(source);
+var p = Position.page(source);
+
+
+target = $(target);
+var delta = [0, 0];
+var parent = null;
+
+
+if (Element.getStyle(target,'position') == 'absolute') {
+parent = Position.offsetParent(target);
+delta = Position.page(parent);
+}
+
+
+if (parent == document.body) {
+delta[0] -= document.body.offsetLeft;
+delta[1] -= document.body.offsetTop;
+}
+
+
+if(options.setLeft)   target.style.left  = (p[0] - delta[0] + options.offsetLeft) + 'px';
+if(options.setTop)    target.style.top   = (p[1] - delta[1] + options.offsetTop) + 'px';
+if(options.setWidth)  target.style.width = source.offsetWidth + 'px';
+if(options.setHeight) target.style.height = source.offsetHeight + 'px';
+},
+
+absolutize: function(element) {
+element = $(element);
+if (element.style.position == 'absolute') return;
+Position.prepare();
+
+var offsets = Position.positionedOffset(element);
+var top     = offsets[1];
+var left    = offsets[0];
+var width   = element.clientWidth;
+var height  = element.clientHeight;
+
+element._originalLeft   = left - parseFloat(element.style.left  || 0);
+element._originalTop    = top  - parseFloat(element.style.top || 0);
+element._originalWidth  = element.style.width;
+element._originalHeight = element.style.height;
+
+element.style.position = 'absolute';
+element.style.top    = top + 'px';
+element.style.left   = left + 'px';
+element.style.width  = width + 'px';
+element.style.height = height + 'px';
+},
+
+relativize: function(element) {
+element = $(element);
+if (element.style.position == 'relative') return;
+Position.prepare();
+
+element.style.position = 'relative';
+var top  = parseFloat(element.style.top  || 0) - (element._originalTop || 0);
+var left = parseFloat(element.style.left || 0) - (element._originalLeft || 0);
+
+element.style.top    = top + 'px';
+element.style.left   = left + 'px';
+element.style.height = element._originalHeight;
+element.style.width  = element._originalWidth;
+}
+}
+
+
+
+
+if (/Konqueror|Safari|KHTML/.test(navigator.userAgent)) {
+Position.cumulativeOffset = function(element) {
+var valueT = 0, valueL = 0;
+do {
+valueT += element.offsetTop  || 0;
+valueL += element.offsetLeft || 0;
+if (element.offsetParent == document.body)
+if (Element.getStyle(element, 'position') == 'absolute') break;
+
+element = element.offsetParent;
+} while (element);
+
+return [valueL, valueT];
+}
+}
+
+Element.addMethods();
+
+
+
+
+
+
+
+
+
+function MCTabs() {
+this.settings = new Array();
+};
+
+MCTabs.prototype.init = function(settings) {
+this.settings = settings;
+};
+
+MCTabs.prototype.getParam = function(name, default_value) {
+var value = null;
+
+value = (typeof(this.settings[name]) == "undefined") ? default_value : this.settings[name];
+
+
+if (value == "true" || value == "false")
+return (value == "true");
+
+return value;
+};
+
+MCTabs.prototype.displayTab = function(tab_id, panel_id) {
+var panelElm = document.getElementById(panel_id);
+var panelContainerElm = panelElm ? panelElm.parentNode : null;
+var tabElm = document.getElementById(tab_id);
+var tabContainerElm = tabElm ? tabElm.parentNode : null;
+var selectionClass = this.getParam('selection_class', 'current');
+
+if (tabElm && tabContainerElm) {
+var nodes = tabContainerElm.childNodes;
+
+
+for (var i=0; i<nodes.length; i++) {
+if (nodes[i].nodeName == "LI")
+nodes[i].className = '';
+}
+
+
+tabElm.className = 'current';
+}
+
+if (panelElm && panelContainerElm) {
+var nodes = panelContainerElm.childNodes;
+
+
+for (var i=0; i<nodes.length; i++) {
+if (nodes[i].nodeName == "DIV")
+nodes[i].className = 'panel';
+}
+
+
+panelElm.className = 'current';
+}
+};
+
+MCTabs.prototype.getAnchor = function() {
+var pos, url = document.location.href;
+
+if ((pos = url.lastIndexOf('#')) != -1)
+return url.substring(pos + 1);
+
+return "";
+};
+
+
+var mcTabs = new MCTabs();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function MultiSelector(list_target, max, current, remove_i18n, updateFunction) {
+
+
+this.list_target = list_target;
+
+if (current) {
+this.count = current;
+}
+else {
+this.count = 0;
+}
+
+this.id = 0;
+
+if (max) {
+this.max = max;
+}
+else {
+this.max = -1;
+}
+
+this.removeStr = remove_i18n;
+this.updateFunction = updateFunction;
+
+
+
+
+this.addElement = function(element) {
+
+
+if (element.tagName == 'INPUT' && element.type == 'file') {
+
+element.name = 'attachFile';
+
+element.id = 'attachFile_' + this.count;
+
+
+element.multi_selector = this;
+
+
+element.onchange = function() {
+
+list_target.style.display = "block";
+
+
+var new_element = document.createElement('input');
+new_element.type = 'file';
+
+
+this.parentNode.insertBefore(new_element, this);
+
+
+this.multi_selector.addElement(new_element);
+
+
+this.multi_selector.addListRow(this);
+
+
+this.style.position = 'absolute';
+this.style.left = '-1000px';
+
+};
+
+if (this.max != -1 && this.count >= this.max) {
+element.style.display = "none";
+element.disabled = true;
+}
+
+
+this.count++;
+
+this.current_element = element;
+}
+else {
+
+alert('Error: not a file input element');
+}
+};
+
+
+
+
+this.addListRow = function(element) {
+
+var new_row = document.createElement('div');
+new_row.className = "jive-attach-item";
+
+
+var new_row_image = document.createElement('img');
+new_row_image.src = "images/attach-7x11.gif";
+new_row_image.alt = "";
+new_row_image.width = "7";
+new_row_image.height = "11";
+new_row_image.border = "0";
+new_row_image.style.value = "margin: 3px 1px 0px 0px;"
+
+
+var new_row_link = document.createElement('a');
+new_row_link.href = '#';
+new_row_link.innerHTML = this.removeStr;
+
+
+new_row.element = element;
+
+new_row.appendChild(new_row_image);
+new_row.appendChild(document.createTextNode(" "));
+
+
+new_row_link.onclick = function() {
+
+
+this.parentNode.element.parentNode.removeChild(this.parentNode.element);
+
+
+this.parentNode.parentNode.removeChild(this.parentNode);
+
+
+this.parentNode.element.multi_selector.count--;
+
+this.parentNode.element.multi_selector.updateFunction(this.parentNode.element.multi_selector.count - 1);
+
+
+if (this.parentNode.element.multi_selector.count < 2) {
+list_target.style.display = "none";
+}
+
+
+this.parentNode.element.multi_selector.current_element.style.display = "block";
+this.parentNode.element.multi_selector.current_element.disabled = false;
+
+
+
+
+return false;
+};
+
+var ua = navigator.userAgent;
+var isWindows = ua.indexOf('Windows') != -1;
+var isMac = !isWindows && ua.indexOf('Mac') != -1;
+
+
+var elValue = element.value;
+
+var fName = elValue;
+if (fName.indexOf('\\') != -1 && isWindows) {
+fName = fName.substring(fName.lastIndexOf('\\') + 1);
+}
+else if (fName.indexOf('/') != -1) {
+fName = fName.substring(fName.lastIndexOf('/') + 1);
+}
+else if (fName.indexOf(':') != -1 && isMac) {
+fName = fName.substring(fName.lastIndexOf(':') + 1);
+}
+new_row.appendChild(document.createTextNode(fName));
+
+
+new_row.appendChild(document.createTextNode(" ("));
+new_row.appendChild(new_row_link);
+new_row.appendChild(document.createTextNode(")"));
+
+
+this.list_target.appendChild(new_row);
+
+this.updateFunction(this.count - 1);
+};
+
+this.removeAttachment = function(elementID, id) {
+
+
+var new_element = document.createElement('input');
+new_element.type = 'hidden';
+new_element.name = "removeAttachID";
+new_element.value = id;
+
+
+var e = document.getElementById(elementID);
+e.parentNode.replaceChild(new_element, e);
+
+
+this.count--;
+
+
+if (this.count < 2) {
+list_target.style.display = "none";
+}
+
+
+this.current_element.style.display = "block";
+this.current_element.disabled = false;
+
+};
+};
+
+
+
+
+
+
+
+
+
+function UploadProgressMonitor() {
+var postButton = 'postButton';
+var progressText = 'Upload in progress:';
+};
+
+function refreshUploadProgress() {
+UploadMonitor.getUploadInfo(updateUploadProgress);
+};
+
+function updateUploadProgress(uploadInfo) {
+if (uploadInfo.inProgress) {
+var el = document.getElementById(UploadProgressMonitor.postButton);
+if (el) {
+el.disabled = true;
+}
+
+var progressPercent = uploadInfo.bytesRead > 0 ? Math.ceil((uploadInfo.bytesRead / uploadInfo.totalSize) * 100) : 0;
+document.getElementById('progressBarText').innerHTML = UploadProgressMonitor.progressText + ' ' + progressPercent + '%';
+document.getElementById('progressBarBoxContent').style.width = parseInt(progressPercent * 3.5) + 'px';
+window.setTimeout('refreshUploadProgress()', 1000);
+}
+else {
+var el = document.getElementById(UploadProgressMonitor.postButton);
+if (el) {
+el.disabled = false;
+}
+}
+};
+
+function startUploadProgress(postButton, progressText, fileElementName) {
+
+
+var e = document.getElementById('attachFile_1');
+if (!e) {
+return;
+}
+UploadProgressMonitor.postButton = postButton;
+if (progressText) {
+UploadProgressMonitor.progressText = progressText;
+}
+
+document.getElementById('progressBar').style.display = 'block';
+document.getElementById('progressBarText').innerHTML = UploadProgressMonitor.progressText + ' 0%';
+var el = document.getElementById(postButton);
+if (el) {
+el.disabled = true;
+}
+
+
+window.setTimeout('refreshUploadProgress()', 1000);
+};
+
+
+
+
+
+
+
+
+
+
+
+var JiveAutoSave = Class.create();
+JiveAutoSave.prototype = {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+initialize: function(enabled,interval,draftType,objectType,objectID, subject, body, properties,
+confirmationMessage, saveMessage, savedMessage) {
+enabled = enabled;
+interval = interval;
+needSave = false;
+draftType = draftType;
+objectType = objectType;
+objectID = objectID;
+subject = subject;
+body = body;
+properties = properties;
+confirmation = true;
+confirmationMessage = confirmationMessage;
+saveMessage = saveMessage;
+savedMessage = savedMessage;
+if (enabled) {
+this.autoSaveInit(interval);
+}
+window.onbeforeunload = this.navigateAway;
+
+},
+
+
+
+
+
+
+autoSaveInit: function(interval) {
+var pe = new PeriodicalExecuter(this.saveDraft, interval);
+},
+
+
+
+
+
+
+
+
+
+saveDraft: function(data) {
+if (needSave) {
+
+
+if (body == 'textEditor' && (data == undefined || data.__proto__ == PeriodicalExecuter.prototype)
+&& getEditorMode() == 'advanced')
+{
+getEditorContent(autoSave.saveDraft);
+return;
+}
+
+var draft = new Object();
+draft.draftID = $F('draftid');
+draft.draftType = draftType
+draft.objectType= objectType;
+draft.objectID = objectID;
+draft.subject = $F(subject);
+if (body == 'textEditor') {
+if (getEditorMode() == 'advanced') {
+draft.body = data;
+} else {
+draft.body = getEditorContent();
+}
+} else {
+draft.body = $F(body);
+}
+draft.properties = {};
+for (var i = 0; i < properties.length; i++) {
+var prop = document.getElementById(properties[i]);
+if (prop.type == 'checkbox' || prop.type == 'radio') {
+if (prop.checked) {
+draft.properties[properties[i]] = 'checked';
+}
+} else if (prop.type == 'text' || prop.type == 'textarea' || prop.type == 'hidden') {
+if (prop.value.length > 0) {
+draft.properties[properties[i]] = prop.value;
+}
+}
+}
+
+Draft.saveDraft(draft, autoSave.postSave);
+}
+},
+
+
+
+
+
+
+postSave: function(data) {
+needSave = false;
+confirmation = false;
+$('doDraft').disabled = true;
+$('doDraft').value = savedMessage;
+$('draftid').value = data.draftID;
+message = data.modificationDateFormatted;
+DWRUtil.setValue("autosave", message);
+
+},
+
+
+
+
+
+messageChangeHandler: function() {
+needSave = true;
+confirmation = true;
+if (enabled && $('doDraft')) {
+$('doDraft').disabled = false;
+$('doDraft').value = saveMessage;
+
+}
+},
+
+
+
+
+
+
+
+
+
+useDraft: function(callbackFunction) {
+enabled = true;
+this.autoSaveInit(interval);
+var self = this;
+if (!callbackFunction) {
+Draft.getDraft(draftType, objectType, objectID, this.displayDraft);
+}
+else {
+Draft.getDraft(draftType, objectType, objectID,
+{
+callback:function(dataFromServer) {
+self.displayDraft(dataFromServer);
+eval(callbackFunction + "()");
+}
+}
+);
+}
+},
+
+
+
+
+
+
+
+
+displayDraft: function(data) {
+var props = data.properties;
+
+if (data.draftType == 18) {
+for (var prop in props) {
+if (prop.indexOf('jive-option-table-option-') > -1 &&
+prop != 'jive-option-table-option-1' &&
+prop != 'jive-option-table-option-2') {
+addOption('jive-option-table', true);
+}
+}
+}
+
+if (body == 'textEditor' && getEditorMode() == 'advanced') {
+retrieveHTML = true;
+setEditorContentFromDraft(data.body);
+} else {
+$(body).value = data.body;
+}
+
+$(subject).value = data.subject;
+
+for (var i = 0; i < properties.length; i++) {
+var prop = document.getElementById(properties[i]);
+if (prop.type == 'checkbox' || prop.type == 'radio') {
+if (props[properties[i]] == 'checked') {
+prop.checked = true;
+}
+} else if (prop.type == 'text' || prop.type == 'textarea' || prop.type == 'hidden') {
+if (props[properties[i]] != undefined && props[properties[i]] != '' ) {
+prop.value = props[properties[i]];
+} else {
+prop.value = '';
+}
+}
+}
+
+Effect.Fade('jive-info-message');
+
+
+},
+
+
+
+
+deleteDraft: function() {
+Draft.deleteDraft(draftType, objectType, objectID, function() {});
+enabled = true;
+this.autoSaveInit(interval);
+Effect.Fade('jive-info-message');
+},
+
+
+
+
+
+
+
+navigateAway: function() {
+if (!$('doDraft').disabled) {
+
+return confirmationMessage + "\n";
+}
+else {
+try {
+event.cancelBubble = true;
+} catch (err) {
+
+}
+}
+},
+
+
+
+
+
+confirmDiscard: function(message) {
+if (confirm(message)) {
+cancelPost = true;
+window.onbeforeunload = null;
+return true;
+}
+else {
+return false;
+}
+},
+
+getProperties: function() {
+return properties;
+},
+
+addProperty: function(prop) {
+properties[properties.length] = prop;
+this.messageChangeHandler();
+},
+
+deleteProperty: function(prop) {
+temp = [];
+k = 0;
+for (var i = 0; i < properties.length; i++) {
+if (properties[i] != prop) {
+temp[k++] = properties[i];
+}
+}
+properties = temp;
+this.messageChangeHandler();
+}
+}
+
+
+var DummyAutoSave = Class.create();
+DummyAutoSave.prototype = {
+
+initialize: function() {
+},
+
+autoSaveInit: function(interval) {
+},
+
+saveDraft: function(data) {
+},
+
+postSave: function(data) {
+},
+
+messageChangeHandler: function() {
+},
+
+useDraft: function(callbackFunction) {
+},
+
+displayDraft: function(data) {
+},
+
+deleteDraft: function() {
+},
+
+navigateAway: function() {
+},
+
+confirmDiscard: function(message) {
+return false;
+},
+
+getProperties: function() {
+},
+
+addProperty: function(prop) {
+},
+
+deleteProperty: function(prop) {
+}
+}
+function jiveCustomCleanup(type, value) {
+switch (type) {
+case "submit_content":
+
+
+
+var start = value.indexOf("[code]");
+var end = value.indexOf("[/code]", start + 6);
+var text = "";
+
+if (start != -1 && end != -1) {
+if (start > 0) {
+text += value.substring(0, start);
+}
+
+while (start > -1 && end > -1) {
+
+text += "[code]";
+var content = value.substring(start + 6, end);
+content = tinyMCE.regexpReplace(content, "<br />", "\n", "gi");
+content = tinyMCE.regexpReplace(content, "<br/>", "\n", "gi");
+text += content;
+
+text += "[/code]";
+
+start = value.indexOf("[code]", end + 7);
+end = value.indexOf("[/code]", start + 6);
+}
+
+if (end + 7 < value.length - 1) {
+text += value.substring(end + 7);
+}
+}
+else {
+text = value;
+}
+
+
+text = text.replace(/\&\#39;/g, '\'');
+text = text.replace(/\&nbsp;/g, ' ');
+
+
+
+text = text.replace(/\<td\>\n[\t ]*/g, '<td>');
+text = text.replace(/\<th\>\n[\t ]*/g, '<th>');
+return text;
+
+break;
+
+case "get_from_editor" :
+
+var text = value.replace(/\&amp;/g, '&');
+text = text.replace(/\&quot;/g, '"');
+text = text.replace(/\&\#39;/g, '\'');
+
+
+
+text = text.replace(/\<td\>\n[\t ]*/g, '<td>');
+text = text.replace(/\<th\>\n[\t ]*/g, '<th>');
+return text;
+break;
+
+case "insert_to_editor" :
+
+
+var start = value.indexOf("[code]");
+var end = value.indexOf("[/code]", start + 6);
+
+if (start != -1 && end != -1) {
+var text = "";
+if (start > 0) {
+text += value.substring(0, start);
+}
+
+while (start > -1 && end > -1) {
+
+text += "[code]";
+var content = value.substring(start + 6, end);
+content = tinyMCE.regexpReplace(content, "\n", "<br />", "gi");
+content = tinyMCE.regexpReplace(content, "\r\n", "<br />", "gi");
+text += content;
+
+text += "[/code]";
+
+start = value.indexOf("[code]", end + 7);
+end = value.indexOf("[/code]", start + 6);
+}
+
+if (end + 7 < value.length - 1) {
+text += value.substring(end + 7);
+}
+return text;
+}
+else {
+return value;
+}
+
+break;
+}
+
+return value;
+}
+
+function jiveConvertWord(type, content) {
+switch (type) {
+
+case "before":
+if (tinyMCE.isGecko) {
+
+
+
+content = content.replace(new RegExp('\n\t+', 'gi'), ' ');
+}
+break;
+
+
+case "after":
+break;
+}
+
+return content;
+}
+
+
+tinyMCE.init({
+jive_base_url : _jive_base_url,
+jive_is_reply : _jive_is_reply,
+jive_spell_check_enabled : _jive_spell_check_enabled,
+_quoteText : _jive_gui_quote_text,
+browsers : "msie,gecko,opera", /* don't support safari right now as it's busted */
+dialog_type : "window",
+width : "100%",
+height : "300",
+button_tile_map : true,
+auto_reset_designmode : true,
+accessibility_focus : false,
+inline_styles : true,
+theme : "advanced",
+content_css : _jive_base_url + "/resources/scripts/tiny_mce/css/editor_content.css",
+jive_theme_content_css : (_jive_theme_base_url && _jive_theme_base_url != "") ? _jive_theme_base_url + "/resources/editor_content.css" : "",
+mode : "none",
+valid_elements : "+code[class],+a[style|name|href|target|title|class],-strong/-b[class|style],-em/-i[class|style],-strike[class|style],-u[class|style],+p[style|dir|class|align],-ol[class|style],-ul[class|style],-li[class|style],br[clear],img[style|class|src|border|alt=|title|hspace|vspace|width|height|align],-sub[style|class],-sup[style|class],-blockquote[style],-div[class|align|style],-span[style|class|align],-pre[class|align|style],address[class|align|style],-h1[style|class|align],-h2[style|class|align],-h3[style|class|align],-h4[style|class|align],-h5[style|class|align],-h6[style|class|align],hr[class|style],-font[face|size|style|class|color],dd[class|title|style|lang],dl[class|title|style|lang],dt[class|title|style|lang]",
+plugins : "jivequote,jiveemoticons,jivespell,paste",
+setupcontent_callback : "setAdvancedEditorContent",
+onchange_callback : "autoSave.messageChangeHandler",
+paste_create_paragraphs : true,
+paste_create_linebreaks : true,
+paste_use_dialog : true,
+paste_auto_cleanup_on_paste : true,
+paste_convert_middot_lists : true,
+paste_insert_word_content_callback : "jiveConvertWord",
+theme_advanced_toolbar_location : "top",
+theme_advanced_toolbar_align : "left",
+theme_advanced_buttons1 : "bold,italic,underline,sup,sub,separator,bullist,numlist,separator,copy,pastetext,pasteword,separator,outdent,indent,formatselect,removeformat,separator,link,forecolor,hr,separator,undo,redo,separator,jivequote,jiveemoticons,jivespell",
+theme_advanced_buttons2 : "",
+theme_advanced_buttons3 : "",
+theme_advanced_resizing : true,
+theme_advanced_resize_horizontal : false,
+theme_advanced_statusbar_location : "bottom",
+theme_advanced_path : false,
+theme_advanced_styles : 'Bold',
+theme_advanced_blockformats : 'p,address,h1,h2,h3,h4,h5,h6',
+table_styles : "table=jive-wiki-table",
+fix_list_elements: true,
+force_p_newlines : false,
+force_br_newlines : true,
+convert_fonts_to_spans : false,
+remove_script_host : false,
+relative_urls  : false,
+cleanup_callback : "jiveCustomCleanup",
+apply_source_formatting : true,
+debug : false
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var RTSS_UNKNOWN_WORD   = 0; // Not yet checked
+var RTSS_VALID_WORD     = 1; // Valid word (confirmed by server)
+var RTSS_INVALID_WORD   = 2; // Invalid word (confirmed by server)
+var RTSS_PENDING_WORD   = 3; // In queue
+var RTSS_DUPLICATE_WORD = 4; // Duplicate word (confirmed by server)
+
+
+
+
+
+
+var webFXSpellCheckHandler = {
+activeRequest: false,
+words        : new Array(),
+pending      : new Array(),
+activeWord   : null,
+instances    : new Array(),
+invalidWordBg: 'url(../../images/redline-12x3.png) repeat-x bottom',
+wordsPerReq  : 500,
+ignore_i18n  : 'Ignore',
+duplicate_i18n  : 'Remove Duplicate',
+no_suggest_i18n : 'No Suggestions',
+onchange_callback : "",
+onkeyup_callback : ""
+};
+
+
+
+
+
+webFXSpellCheckHandler._init = function(el) {
+var menu, inner, item;
+
+menu = document.createElement('div');
+menu.id = 'webfxSpellCheckMenu';
+menu.className = 'jive-spellchecker-menu';
+menu.style.display = 'none';
+
+inner = document.createElement('div');
+inner.className = 'inner';
+menu.appendChild(inner);
+
+item = document.createElement('div');
+item.className = 'separator';
+inner.appendChild(item);
+
+
+
+
+item = document.createElement('span');
+var link = "<a href='#' onclick=\"javascript:webFXSpellCheckHandler._ignoreWord();\">Ignore</a>";
+item.innerHTML = link;
+inner.appendChild(item);
+
+document.body.appendChild(menu);
+};
+
+
+webFXSpellCheckHandler._spellCheck = function(word) {
+if (word.match(/\d/)) return RTSS_VALID_WORD;
+if (webFXSpellCheckHandler.words[word]) { return webFXSpellCheckHandler.words[word][0]; }
+webFXSpellCheckHandler.words[word] = [RTSS_PENDING_WORD];
+webFXSpellCheckHandler.pending.push(word);
+
+
+
+return RTSS_PENDING_WORD;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+webFXSpellCheckHandler._askServer = function() {
+var i, len, word, aMap;
+var async = true;
+
+if (webFXSpellCheckHandler.activeRequest) { return; }
+len = webFXSpellCheckHandler.pending.length;
+if (len) {
+webFXSpellCheckHandler.activeRequest = true;
+aMap = new Array();
+
+if (len > webFXSpellCheckHandler.wordsPerReq) { len = webFXSpellCheckHandler.wordsPerReq; }
+for (i = 0; i < len; i++) {
+word = webFXSpellCheckHandler.pending.shift();
+webFXSpellCheckHandler.words[word] = [RTSS_PENDING_WORD];
+aMap[i] = word;
+}
+
+
+
+JiveSpellChecker.checkWords(aMap,
+{
+callback:function(dataFromServer) {
+webFXSpellCheckHandler._serverResponseHandler(dataFromServer, aMap);
+}
+}
+);
+}
+};
+
+webFXSpellCheckHandler._serverResponseHandler = function(sData, aMap) {
+var i, flag, len, data, word, suggestions;
+try {
+eval(sData);
+}
+catch (oe) { return; }
+len = data.length;
+for (i = 0; i < len; i++) {
+flag = data[i][0];
+word = aMap[i];
+suggestions = data[i][1];
+if (!webFXSpellCheckHandler.words[word]) {
+return;
+}
+switch (flag) {
+case 0:
+webFXSpellCheckHandler.words[word][0] = RTSS_INVALID_WORD;
+webFXSpellCheckHandler.words[word][1] = suggestions;
+break;
+case 1:
+webFXSpellCheckHandler.words[word][0] = RTSS_VALID_WORD;
+break;
+};
+}
+webFXSpellCheckHandler.activeRequest = false;
+webFXSpellCheckHandler._updateWords();
+if (webFXSpellCheckHandler.pending.length) { webFXSpellCheckHandler._askServer(); }
+};
+
+
+webFXSpellCheckHandler._updateWords = function() {
+var aNodes, i, n, len, eInstance, ow;
+
+for (n = 0; n < webFXSpellCheckHandler.instances.length; n++) {
+aNodes = webFXSpellCheckHandler.instances[n].elCont.getElementsByTagName('span');
+len = aNodes.length;
+for (i = 0; i < len; i++) {
+if (aNodes[i].childNodes.length != 1) { continue; }
+if (aNodes[i].firstChild.nodeType != 3) { continue; }
+ow = webFXSpellCheckHandler.words[aNodes[i].firstChild.nodeValue];
+if (!ow) { continue; }
+switch (ow[0]) {
+case RTSS_VALID_WORD: {
+var word;
+if (!aNodes[i].firstChild) {
+aNodes[i].style.background = 'none';
+break;
+}
+word = aNodes[i].firstChild.nodeValue;
+
+if (i == 0) {
+aNodes[i].style.background = 'none';
+break;
+}
+
+var prevNode = aNodes[i-1];
+
+if (!prevNode || !prevNode.firstChild) {
+aNodes[i].style.background = 'none';
+break;
+}
+if (prevNode.firstChild.nodeValue == word) {
+aNodes[i].setAttribute('dupWord', RTSS_DUPLICATE_WORD);
+aNodes[i].style.background = webFXSpellCheckHandler.invalidWordBg;
+}
+else {
+aNodes[i].style.background = 'none';
+}
+break;
+}
+case RTSS_PENDING_WORD: aNodes[i].style.background = 'none';                                 break;
+case RTSS_INVALID_WORD: aNodes[i].style.background = webFXSpellCheckHandler.invalidWordBg;   break;
+};
+}
+}
+};
+
+webFXSpellCheckHandler._showSuggestionsMenu = function(e, el, word, instance) {
+var menu, len, item, sep, frame, aSuggestions, doc, x, y, o;
+
+if (!webFXSpellCheckHandler.words[word]) { return; }
+
+menu = document.getElementById('webfxSpellCheckMenu');
+len = menu.firstChild.childNodes.length;
+while (len > 2) { menu.firstChild.removeChild(menu.firstChild.firstChild); len--; }
+sep = menu.firstChild.firstChild;
+
+switch (webFXSpellCheckHandler.words[word][0]) {
+case RTSS_INVALID_WORD: {
+aSuggestions = webFXSpellCheckHandler.words[word][1];
+len = aSuggestions.length;
+if (len > 10) { len = 10; }
+for (i = 0; i < len; i++) {
+
+
+
+item = document.createElement('span');
+var link = "<a href='#' onclick=\"javascript:webFXSpellCheckHandler._replaceWord(" + instance + ", '" + aSuggestions[i] + "');\">" + aSuggestions[i] + "</a>";
+item.innerHTML = link;
+menu.firstChild.insertBefore(item, sep);
+}
+if (len == 0) {
+item = document.createElement('a');
+item.href = 'javascript:void(0);'
+item.appendChild(document.createTextNode('No suggestions'));
+menu.firstChild.insertBefore(item, sep);
+}
+break;
+}
+case RTSS_VALID_WORD : {
+
+if (el.getAttribute('dupWord') == RTSS_DUPLICATE_WORD) {
+item = document.createElement('a');
+item.href = 'javascript:webFXSpellCheckHandler._removeWord(' + instance + ', "' + word + '");'
+item.appendChild(document.createTextNode('Remove Duplicate'));
+menu.firstChild.insertBefore(item, sep);
+break;
+}
+}
+};
+
+var n;
+for (n = 0; n < webFXSpellCheckHandler.instances.length; n++) {
+if (webFXSpellCheckHandler.instances[n].doc == el.ownerDocument) {
+frame = webFXSpellCheckHandler.instances[n].el;
+doc   = webFXSpellCheckHandler.instances[n].doc;
+}
+}
+
+x = 0; y = 0;
+for (o = frame; o; o = o.offsetParent) {
+x += (o.offsetLeft - o.scrollLeft);
+y += (o.offsetTop - o.scrollTop);
+}
+
+if (document.all) {
+menu.style.left = x + (e.pageX || e.clientX) + 'px';
+menu.style.top  = y + (e.pageY || e.clientY) + (el.offsetHeight/2) + 'px';
+}
+else {
+menu.style.left = x + ((e.pageX || e.clientX) - document.body.scrollLeft) + 'px';
+menu.style.top  = (y + (e.pageY || (e.clientY + document.body.scrollTop)) + (el.offsetHeight/2)) + 'px';
+}
+menu.style.display = 'block';
+
+webFXSpellCheckHandler.activeWord = word;
+};
+
+
+webFXSpellCheckHandler._replaceWord = function(instance, word) {
+var o = webFXSpellCheckHandler.instances[instance];
+if (o) {
+o.self.replaceActive(word);
+}
+
+autoSave.messageChangeHandler();
+webFXSpellCheckHandler._hideSuggestionsMenu();
+};
+
+
+webFXSpellCheckHandler._removeWord = function(instance, word) {
+var o = webFXSpellCheckHandler.instances[instance];
+if (o) {
+o.self.removeActive(word);
+}
+
+webFXSpellCheckHandler.words[word][0] = RTSS_VALID_WORD;
+webFXSpellCheckHandler._hideSuggestionsMenu();
+};
+
+
+webFXSpellCheckHandler._ignoreWord = function() {
+var word, i, len, o;
+
+word = webFXSpellCheckHandler.activeWord;
+
+if (word) {
+webFXSpellCheckHandler.words[word][0] = RTSS_VALID_WORD;
+webFXSpellCheckHandler.words[word][1] = [];
+
+len = webFXSpellCheckHandler.instances.length;
+for (i = 0; i < len; i++) {
+o = webFXSpellCheckHandler.instances[i];
+o.self.rescan(word);
+}
+}
+
+webFXSpellCheckHandler._hideSuggestionsMenu();
+};
+
+
+webFXSpellCheckHandler._hideSuggestionsMenu = function() {
+document.getElementById('webfxSpellCheckMenu').style.display = 'none';
+webFXSpellCheckHandler.activeWord = null;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function WebFXLiteSpellChecker(el) {
+var agt, o, elCont, self;
+
+agt = navigator.userAgent.toLowerCase();
+
+this.isIE    = ((agt.indexOf("msie")  != -1) && (agt.indexOf("opera") == -1));
+this.isGecko = ((agt.indexOf('gecko') != -1) && (agt.indexOf("khtml") == -1));
+
+if ((!this.isIE) && (!this.isGecko)) {
+this.el        = el;
+this.supported = false;
+return;
+}
+
+
+this.SPELL_CHECK_DELAY = 100;
+
+
+this.supported = true;
+this.elText    = el;
+this._start    = 0;
+this._end      = 0;
+this._last     = "";
+this._len      = 0;
+this._lagTimer = null;
+
+
+elCont = document.createElement('div');
+elCont.id = 'jive-spell-markup-div';
+elCont.className = 'jive-spell-markupbox';
+el.parentNode.insertBefore(elCont, el);
+elCont.style.width = el.offsetWidth + 'px';
+elCont.style.height = el.clientHeight + 'px';
+
+
+this.elCont = elCont;
+
+if (webFXSpellCheckHandler.instances.length == 0) { webFXSpellCheckHandler._init(el); }
+o = new Object();
+o.elText = el;
+o.elCont = elCont;
+o.self   = this;
+this._instance = webFXSpellCheckHandler.instances.length;
+webFXSpellCheckHandler.instances.push(o);
+
+
+
+
+self = this;
+
+this._handleChange = function(e) {
+self._handleKey(self._getKeyCode(e));
+self._syncScroll();
+self._lagTimer = null;
+};
+
+
+this.elText.onkeydown = function(e) {
+
+
+if (this.isIE) {
+
+var keyCode = self._getKeyCode(e);
+if (keyCode == 8 || keyCode == 46) {
+
+
+
+
+
+
+
+self._getSelection();
+
+var str = self.elText.value;
+var len = str.length;
+
+
+if (keyCode == 46) {
+var start = self._start;
+var end = (start < self._end) ? self._end : self._end + 1;
+end = Math.min(end, len);
+self.elText.value = str.substr(0, start) + str.substr(end, len);
+self._end = end;
+self._setCursorPosition(self._start);
+
+}
+
+else {
+var start = self._start;
+var end = self._end;
+start = (start == end) ? start - 1 : start;
+start = Math.max(start, 0);
+self.elText.value = str.substr(0, start) + str.substr(self._end, len);
+self._start = start;
+self._setCursorPosition(self._start);
+}
+
+
+
+
+self._handleChange(e);
+self._cancelEvent(e);
+}
+}
+};
+
+
+this.elText.onkeypress = function(e) {
+
+if (this.isGecko) {
+var keyCode = self._getKeyCode(e);
+switch (keyCode) {
+
+case 37: case 38: case 39: case 40:
+self._handleChange(e);
+break;
+}
+}
+};
+
+
+this.elText.onkeyup = function(e) {
+
+var keyCode = self._getKeyCode(e);
+if (keyCode == 8 || keyCode == 46) {
+self._handleChange(e);
+return;
+}
+
+if (self._lagTimer) clearTimeout(self._lagTimer);
+self._lagTimer = setTimeout(self._handleChange, self.SPELL_CHECK_DELAY);
+
+if (webFXSpellCheckHandler.onkeyup_callback != "") {
+eval(webFXSpellCheckHandler.onkeyup_callback + "()");
+}
+};
+
+this.elText.onchange = function(e) {
+if (webFXSpellCheckHandler.onkeyup_callback != "") {
+eval(webFXSpellCheckHandler.onkeyup_callback + "()");
+}
+};
+
+
+
+
+
+
+this.elText.onselect = function(e) {
+self._determineActiveNode();
+self._syncScroll();
+};
+
+this.elText.onclick = function(e) {
+
+
+
+self._getSelection();
+self._syncScroll();
+};
+
+this.elCont.onmousedown = function(e) {
+if (document.getElementById('webfxSpellCheckMenu').style.display != "none") {
+webFXSpellCheckHandler._hideSuggestionsMenu();
+}
+};
+
+
+
+
+
+
+if (this.isGecko) {
+this.elText.onmousemove = function(e) {
+self._syncScroll();
+};
+}
+else {
+this.elText.onscroll = function(e) {
+self._syncScroll();
+};
+}
+
+
+this.update();
+}
+
+
+WebFXLiteSpellChecker.prototype.getText = function() {
+return this.elText.value;
+};
+
+
+WebFXLiteSpellChecker.prototype.setText = function(str) {
+this.elText.value = str;
+this.update();
+};
+
+
+WebFXLiteSpellChecker.prototype.replaceActive = function(word) {
+var str, len, n, offset, start, end, c;
+
+if (this._nodeEnd) {
+this._setWord(this._nodeEnd, word);
+
+str = this.elText.value;
+len = str.length;
+
+offset = this._end;
+
+for (n = offset-2; n >= 0; n--) {
+c = str.substr(n, 1);
+if (!c.match(/[\w\'\u2019]/)) { break; } //'
+}
+start = n+1;
+
+for (n = offset; n < len; n++) {
+c = str.substr(n, 1);
+if (!c.match(/[\w\'\u2019]/)) { break; } //'
+}
+end = n;
+
+this.elText.value = str.substr(0, start) + word + str.substr(end, len-end);
+
+
+
+
+this._last  = this.elText.value;
+this._len   = this._last.length;
+}
+};
+
+
+WebFXLiteSpellChecker.prototype.removeActive = function(word) {
+var str, len, n, offset, start, end, c;
+
+if (this._nodeEnd) {
+this._setWord(this._nodeEnd, "");
+
+str = this.elText.value;
+len = str.length;
+
+offset = this._end;
+
+for (n = offset-2; n >= 0; n--) {
+c = str.substr(n, 1);
+if (!c.match(/[\w\'\u2019]/)) { break; }
+}
+start = n+1;
+
+for (n = offset; n < len; n++) {
+c = str.substr(n, 1);
+if (!c.match(/[\w\'\u2019]/)) { break; }
+}
+end = n;
+
+this.elText.value = str.substr(0, start) + str.substr(end, len-end);
+}
+};
+
+
+
+WebFXLiteSpellChecker.prototype.rescan = function(word) {
+if (word) {
+word = word.toLowerCase();
+var kids = this.elCont.getElementsByTagName('span');
+for (var i = 0,l = kids.length; i < l; i++) {
+if (kids[i].getAttribute('lc') == word) kids[i].style.background = 'none';
+if (kids[i].getAttribute('dupWord') == RTSS_DUPLICATE_WORD) {
+kids[i].setAttribute('dupWord', RTSS_VALID_WORD);
+kids[i].style.background = 'none';
+}
+}
+}
+else {
+var kids = this.elCont.getElementsByTagName('span');
+for (var i = 0, l = kids.length; i < l; i++) {
+var node = kids[i];
+if (!node.firstChild) { continue; }
+word = node.firstChild.nodeValue;
+var prevWord;
+
+switch (webFXSpellCheckHandler._spellCheck(word)) {
+case RTSS_VALID_WORD: {
+if (i == 0) {
+if (node.style.background != 'none') node.style.background = 'none';
+break;
+}
+
+if (word == prevWord) {
+node.setAttribute('dupWord', RTSS_DUPLICATE_WORD);
+node.style.background = webFXSpellCheckHandler.invalidWordBg;
+}
+else if (node.style.background != 'none') {
+node.style.background = 'none';
+}
+break;
+}
+case RTSS_PENDING_WORD: if (node.style.background != 'none') node.style.background = 'none';  break;
+case RTSS_INVALID_WORD: if (node.style.background != webFXSpellCheckHandler.invalidWordBg) node.style.background = webFXSpellCheckHandler.invalidWordBg;   break;
+};
+
+prevWord = word;
+}
+}
+};
+
+
+
+
+
+
+
+WebFXLiteSpellChecker.prototype._getSelection = function() {
+if (document.all) {
+var sr, r, offset;
+sr = document.selection.createRange();
+r = sr.duplicate();
+r.moveToElementText(this.elText);
+r.setEndPoint('EndToEnd', sr);
+this._start = r.text.length - sr.text.length;
+this._end   = this._start + sr.text.length;
+}
+else {
+this._start = this.elText.selectionStart;
+this._end   = this.elText.selectionEnd;
+}
+};
+
+
+WebFXLiteSpellChecker.prototype._handleKey = function(keyCode) {
+var str, len, lastStart, lastEnd;
+
+str = this.elText.value;
+len = str.length;
+
+lastStart = this._start;
+lastEnd   = this._end;
+
+
+
+if (this.isGecko && lastStart == lastEnd && keyCode == 46) {
+lastEnd++;
+}
+
+this._determineActiveNode();
+
+
+if ((this._last != str) || (len != this._len)) {
+
+
+if (lastEnd > lastStart) {
+
+this._remove(lastStart, lastEnd);
+}
+
+else if (lastEnd > this._start) {
+
+this._remove(this._start, lastEnd);
+}
+
+
+if (this._start > lastStart) {
+
+this._insert(lastStart, this._start);
+}
+}
+
+this._len   = len;
+this._last  = str;
+};
+
+
+WebFXLiteSpellChecker.prototype.reSyncScroll = function() {
+this.elText.scrollTop = this.elCont.scrollTop;
+this.elText.scrollLeft = this.elCont.scrollLeft;
+};
+
+
+WebFXLiteSpellChecker.prototype.markup = function() {
+this.elCont.width = this.elText.clientWidth;
+this.elCont.style.display = "block";
+
+
+
+if (this._lagTimer) clearTimeout(this._lagTimer);
+this._handleChange();
+;
+webFXSpellCheckHandler._askServer();
+this._syncScroll();
+
+};
+
+
+WebFXLiteSpellChecker.prototype.hasPendingServerRequests = function() {
+return webFXSpellCheckHandler.pending.length > 0 || webFXSpellCheckHandler.activeRequest;
+}
+
+
+WebFXLiteSpellChecker.prototype.hideMarkup = function() {
+webFXSpellCheckHandler._hideSuggestionsMenu();
+this.elCont.style.display = "none";
+};
+
+
+WebFXLiteSpellChecker.prototype.resetMarkup = function() {
+webFXSpellCheckHandler.words = new Array();
+webFXSpellCheckHandler.pending = new Array();
+webFXSpellCheckHandler.activeWord = null;
+
+this.update();
+this._syncScroll();
+this.rescan();
+};
+
+
+WebFXLiteSpellChecker.prototype.update = function() {
+
+this.elCont.innerHTML = "";
+
+this._insertWord(null, this.elText.value);
+
+
+this._last  = this.elText.value;
+this._len   = this._last.length;
+webFXSpellCheckHandler._askServer();
+};
+
+
+WebFXLiteSpellChecker.prototype._createWordNode = function(word) {
+var node = document.createElement('span');
+node.className = 'jive-spellchecker-word';
+node.setAttribute('lc', word.toLowerCase());
+node.appendChild(document.createTextNode(word));
+
+switch (webFXSpellCheckHandler._spellCheck(word)) {
+case RTSS_VALID_WORD: node.style.background = 'none';                                   break;
+case RTSS_PENDING_WORD: node.style.background = 'none';                                 break;
+case RTSS_INVALID_WORD: node.style.background = webFXSpellCheckHandler.invalidWordBg;   break;
+case RTSS_DUPLICATE_WORD: node.style.background = webFXSpellCheckHandler.invalidWordBg; break;
+};
+node.f = this;
+node.onclick = function(e) {
+this.f._handleNodeClick((e)?e:window.event, this);
+}
+
+return node;
+};
+
+
+WebFXLiteSpellChecker.prototype._determineActiveNode = function() {
+var i, len, c, str, node, l;
+
+this._getSelection();
+this._nodeStart = null;
+this._nodeEnd   = null;
+
+node = this.elCont.firstChild;
+for (i = 0; node; node = node.nextSibling) {
+if (node.nodeType == 1) {
+str = (node.firstChild)?node.firstChild.nodeValue:'\n';
+}
+else { str = node.nodeValue; }
+n = str.length;
+
+if (i+n <= this._start) { this._nodeStart = node; }
+this._nodeEnd = node;
+if (i+n >= this._end) { break; }
+i += n;
+}
+};
+
+
+WebFXLiteSpellChecker.prototype._setWord = function(el, word) {
+var i, len, c, str, node, doc, n, last;
+
+len = word.length;
+str = '';
+n = 0;
+for (i = 0; i < len; i++) {
+c = word.substr(i, 1);
+if (!c.match(/[\w\'\u2019]/)) { // Match all but numbers, letters, -, ' and â
+if (str) {
+el.parentNode.insertBefore(this._createWordNode(str), el);
+}
+
+last = (el.previousSibling)?el.previousSibling.nodeValue:'';
+switch (c) {
+case '\n': node = document.createElement('br');                   break;
+case ' ':  node = document.createTextNode((last == ' ')?' ':' '); break;
+default:   node = document.createTextNode(c);
+};
+el.parentNode.insertBefore(node, el);
+str = '';
+n++;
+}
+else { str += c; }
+}
+if (str) {
+if (el.firstChild) {
+el.firstChild.nodeValue = str;
+switch (webFXSpellCheckHandler._spellCheck(str)) {
+case RTSS_VALID_WORD: el.style.background = 'none';                                   break;
+case RTSS_PENDING_WORD: el.style.background = 'none';                                 break;
+case RTSS_INVALID_WORD: el.style.background = webFXSpellCheckHandler.invalidWordBg;   break;
+case RTSS_DUPLICATE_WORD: el.style.background = webFXSpellCheckHandler.invalidWordBg; break;
+};
+}
+else {
+node = this._createWordNode(str);
+el.parentNode.replaceChild(node, el);
+el = node;
+}
+}
+else {
+node = el.previousSibling;
+el.parentNode.removeChild(el);
+el = node;
+}
+
+return el;
+};
+
+
+WebFXLiteSpellChecker.prototype._insertWord = function(el, word) {
+var i, len, c, str, node, n, last;
+
+len = word.length;
+str = '';
+n = 0;
+node = null;
+for (i = 0; i < len; i++) {
+c = word.substr(i, 1);
+if (!c.match(/[\w\'\u2019]/)) { // Match all but numbers, letters, -, ' and â
+if (str) {
+if (el) { node = this.elCont.insertBefore(this._createWordNode(str), el); }
+else { node = this.elCont.appendChild(this._createWordNode(str)); }
+}
+
+last = ((el) && (el.previousSibling))?el.previousSibling.nodeValue:'';
+switch (c) {
+case '\n': node = document.createElement('br'); break;
+case ' ':  node = document.createTextNode((last == ' ')?' ':' '); break;
+default:   node = document.createTextNode(c);
+};
+if (el) { this.elCont.insertBefore(node, el); }
+else { this.elCont.appendChild(node); }
+str = '';
+n++;
+}
+else { str += c; }
+}
+if (str) {
+if (el) { node = this.elCont.insertBefore(this._createWordNode(str), el); }
+else { node = this.elCont.appendChild(this._createWordNode(str)); }
+}
+else if (el) {
+if (!node) { node = el.previousSibling; }
+}
+
+return node;
+};
+
+WebFXLiteSpellChecker.prototype._remove = function(startPos, endPos) {
+var node, i, n, startNode, endNode, word, next;
+
+
+i = 0;
+startNode = endNode = null;
+for (node = this.elCont.firstChild; node; node = node.nextSibling) {
+if (node.nodeType == 1) {
+str = (node.firstChild)?node.firstChild.nodeValue:'\n';
+}
+else { str = node.nodeValue; }
+n = str.length;
+
+if ((startNode == null) && (i + n >= startPos)) {
+startNode = node;
+word = str.substr(0, startPos - i);
+}
+if (i + n >= endPos) {
+endNode = node.nextSibling;
+word += str.substr(endPos - i, n - (endPos - i));
+break;
+}
+
+i += n;
+}
+
+if (!startNode) { return; }
+
+
+for (node = startNode.nextSibling; node != endNode; node = next) {
+next = node.nextSibling;
+this.elCont.removeChild(node);
+}
+
+
+this._setWord(startNode, word);
+};
+
+WebFXLiteSpellChecker.prototype._insert = function(startPos, endPos) {
+var str, i, len, c, word, newNode, offset, startNode;
+
+
+i = 0;
+startNode = null;
+for (node = this.elCont.firstChild; node; node = node.nextSibling) {
+if (node.nodeType == 1) {
+str = (node.firstChild)?node.firstChild.nodeValue:'\n';
+}
+else { str = node.nodeValue; }
+n = str.length;
+if (i + n >= startPos) {
+startNode = node;
+offset = startPos - i
+break;
+}
+i += n;
+}
+
+str = this.elText.value.substring(startPos, endPos);
+if (startNode) {
+if (startNode.firstChild) {
+word = node.firstChild.nodeValue.substr(0, offset) + str + node.firstChild.nodeValue.substr(offset, node.firstChild.nodeValue.length);
+this._setWord(startNode, word);
+}
+else {this._insertWord(startNode.nextSibling, str); }
+}
+else {
+len = str.length;
+node = startNode;
+word = '';
+for (i = 0; ; i++) {
+c = str.substr(i, 1);
+if ((i >= len) || (!c.match(/[\w\'\u2019]/))) { // all but numbers, letters, ' and â
+if (word) {
+newNode = this._createWordNode(word);
+if (node) { this.elCont.insertBefore(newNode, node); }
+else { this.elCont.appendChild(newNode); }
+word = '';
+}
+if (i >= len) { break; }
+
+last = (node && node.previousSibling)?node.previousSibling.nodeValue:'';
+switch (c) {
+case '\n': newNode = document.createElement('br');                   break;
+case ' ':  newNode = document.createTextNode((last == ' ')?' ':' '); break;
+default:   newNode = document.createTextNode(c);
+};
+if (node) { this.elCont.insertBefore(newNode, node); }
+else { this.elCont.appendChild(newNode); }
+
+}
+else { word += c; }
+}
+}
+};
+
+WebFXLiteSpellChecker.prototype._syncScroll = function() {
+this.elCont.scrollTop = this.elText.scrollTop;
+this.elCont.scrollLeft = this.elText.scrollLeft;
+};
+
+WebFXLiteSpellChecker.prototype._handleClick = function(e) {
+var word, o;
+
+this._determineActiveNode();
+if ((this._nodeEnd) && (this._nodeEnd.firstChild)) {
+word = this._nodeEnd.firstChild.nodeValue;
+o    = webFXSpellCheckHandler.words[word];
+if ((o) && (o[0] == RTSS_INVALID_WORD || this._nodeEnd.getAttribute("dupWord") == RTSS_DUPLICATE_WORD)) {
+webFXSpellCheckHandler._showSuggestionsMenu(e, this._nodeEnd, word, this._instance);
+return
+}
+}
+
+webFXSpellCheckHandler._hideSuggestionsMenu();
+};
+
+
+WebFXLiteSpellChecker.prototype._handleNodeClick = function(e, node) {
+var word, o;
+
+
+var index = 0;
+var n = this.elCont.firstChild;
+for (i = 0; n; n = n.nextSibling) {
+if (n.nodeType == 1) {
+str = (n.firstChild)?n.firstChild.nodeValue:'\n';
+}
+else { str = n.nodeValue; }
+
+if (n == node) {
+this._start = index;
+}
+index += str.length;
+if (n == node) {
+this._end = index;
+break;
+}
+}
+
+this._nodeStart = node;
+this._nodeEnd = node;
+
+word = node.firstChild.nodeValue;
+o    = webFXSpellCheckHandler.words[word];
+if ((o) && (o[0] == RTSS_INVALID_WORD || node.getAttribute("dupWord") == RTSS_DUPLICATE_WORD)) {
+webFXSpellCheckHandler._showSuggestionsMenu(e, node, word, this._instance);
+return;
+}
+
+webFXSpellCheckHandler._hideSuggestionsMenu();
+};
+
+
+WebFXLiteSpellChecker.prototype._getKeyCode = function(e) {
+var code;
+if (!e) e = window.event;
+if (!e) return code;
+if (e.which) code = e.which;
+else if (e.keyCode) code = e.keyCode;
+
+return code;
+};
+
+WebFXLiteSpellChecker.prototype._cancelEvent = function(e) {
+if (!e) e = window.event;
+if (e.which) return false;
+else e.returnValue = false;
+};
+
+WebFXLiteSpellChecker.prototype._setCursorPosition = function(position) {
+if (this.elText.setSelectionRange) {
+this.elText.setSelectionRange(position, position);
+}
+else if (this.elText.createTextRange) {
+var range = this.elText.createTextRange();
+range.collapse(true);
+range.moveEnd('character', position -2);
+range.moveStart('character', position -2);
+range.select();
+}
+};
+
+var advancedModeEnabled = true;
+var preferredMode = "";
+var currentMode = "";
+var previousMode = "";
+var currentHTML = "";
+var retrieveHTML = true;
+var editorEnabled = true;
+<!-- inline spell checker object -->
+var oSpell;
+
+var DWRTimeout = 20000;
+
+function doUpdateAdvancedEditor(str) {
+var newMode = "advanced";
+currentHTML = str;
+
+showEditor(newMode);
+retrieveHTML = false;
+previousMode = currentMode;
+currentMode = newMode;
+}
+
+function doUpdateTextEditor(str) {
+showEditor("text");
+retrieveHTML = true;
+setEditorContent("text", str);
+}
+
+function doUpdatePreview(str) {
+showEditor("preview");
+setEditorContent("preview", str);
+}
+
+function doInitialContentForAdvancedEditor(str) {
+tinyMCE.execInstanceCommand('GUIEditor', 'mceSetContent', false, str, true);
+currentHTML = str;
+}
+
+function setAdvancedEditorContent(editor_id, body, doc) {
+body.innerHTML = currentHTML;
+}
+
+
+function getEditorContent(callbackFunction) {
+if (currentMode == "" || currentMode == "text") {
+var textarea = $('textEditor');
+return textarea.value;
+}
+else if (currentMode == "advanced") {
+var c = tinyMCE.getContent('GUIEditor');
+
+c = jiveCustomCleanup("submit_content", c);
+
+if (callbackFunction == undefined) {
+callbackFunction = function(str) {return str;}
+}
+WikiTextConverter.convertToWiki(c,
+{
+callback: callbackFunction,
+timeout: DWRTimeout, // 20 seconds
+errorHandler: editorErrorHandler
+}
+);
+}
+else if (currentMode == "preview") {
+var textarea = $('textEditor');
+return textarea.value;
+}
+
+return "";
+}
+
+function setEditorContentFromDraft(draftContent) {
+
+WikiTextConverter.convertFromWiki(draftContent,
+{
+callback: doUpdateFromDraft,
+timeout: DWRTimeout, // 20 seconds
+errorHandler: editorErrorHandler
+}
+);
+};
+
+function doUpdateFromDraft(updatedHTML) {
+currentHTML = updatedHTML;
+retrieveHTML = true;
+tinyMCE.execInstanceCommand('GUIEditor', 'mceSetContent', false, currentHTML, true);
+};
+
+function setEditorContent(newMode, updatedHTML) {
+if (updatedHTML == null && retrieveHTML) {
+if (currentMode == "" || currentMode == "text") {
+var textarea = $('textEditor');
+currentHTML = textarea.value;
+}
+else if (currentMode == "advanced") {
+currentHTML = tinyMCE.getContent('GUIEditor');
+
+currentHTML = jiveCustomCleanup("submit_content", currentHTML);
+}
+
+else if (newMode == "text" && currentMode == "preview" && previousMode == "text") {
+var textarea = $('textEditor');
+currentHTML = textarea.value;
+}
+}
+else if (retrieveHTML) {
+currentHTML = updatedHTML;
+}
+
+retrieveHTML = true;
+
+if (currentHTML != null) {
+if (newMode == "advanced") {
+tinyMCE.execInstanceCommand('GUIEditor', 'mceSetContent', false, currentHTML, true);
+}
+else if (newMode == "text") {
+var textarea = $('textEditor');
+textarea.value = currentHTML;
+}
+else if (newMode == "preview") {
+var previewDiv = $('preview-panel');
+previewDiv.innerHTML = currentHTML;
+
+
+
+var height = previewDiv.scrollHeight;
+if (currentMode == "text") {
+var textarea = $('textEditor');
+height = (textarea.clientHeight > height) ? textarea.clientHeight : height;
+}
+else if (currentMode = "advanced") {
+var t = tinyMCE.settings['height'];
+if (t) {
+var h = parseInt(t);
+height = (h > height) ? h : height;
+}
+}
+
+var divHeight = previewDiv.style.height;
+if (!divHeight) {
+divHeight = 0;
+}
+
+if (parseInt(divHeight) < height) {
+previewDiv.style.height = (10 + height) + "px";
+}
+}
+}
+
+previousMode = currentMode;
+currentMode = newMode;
+}
+
+
+function getPreferredEditorMode() {
+if (preferredMode == "") {
+WikiTextConverter.getPreferredEditorMode(
+{
+callback: function(mode) {
+preferredMode = mode;
+},
+timeout: DWRTimeout, // 20 seconds
+errorHandler: editorErrorHandler
+}
+);
+}
+
+if (preferredMode == "") {
+preferredMode = "text";
+}
+return preferredMode;
+}
+
+
+
+
+
+
+function pause(numberMillis) {
+if (window.showModalDialog) {
+var dialogScript =
+'window.setTimeout(' +
+' function () { window.close(); }, ' + numberMillis + ');';
+var result =
+window.showModalDialog(
+'javascript:document.writeln(' +
+'"<script>' + dialogScript + '<' + '/script>")');
+}
+else {
+var now = new Date();
+var exitTime = now.getTime() + numberMillis;
+while (true) {
+now = new Date();
+if (now.getTime() > exitTime)
+return;
+}
+}
+}
+
+function setPreferredEditorMode(mode) {
+showEditorWaitImage(true);
+preferredMode = mode;
+WikiTextConverter.setPreferredEditorMode(mode,
+{
+callback: function() {
+showEditorWaitImage(false);
+
+var modeSelector = $('jivePreferredEditorModeLink');
+modeSelector.style.visibility = 'hidden';
+},
+timeout: DWRTimeout, // 20 seconds
+errorHandler: editorErrorHandler
+}
+);
+}
+
+function disableAdvancedMode() {
+advancedModeEnabled = false;
+}
+
+function getEditorMode() {
+return currentMode;
+}
+
+function setEditorMode(newMode) {
+if (!advancedModeEnabled) {
+
+var advancedTab = $('wysiwyg-tab');
+if (advancedTab) {
+advancedTab.parentNode.removeChild(advancedTab);
+}
+
+if ("advanced" == newMode) {
+newMode = "text";
+}
+}
+else {
+var pMode = getPreferredEditorMode();
+if (pMode != newMode && newMode != 'preview') {
+modeSelectorText = $('jivePreferredEditorMode-' + newMode).innerHTML;
+$('jivePreferredEditorModeLinkHREF').innerHTML = modeSelectorText;
+var modeSelector = $('jivePreferredEditorModeLink');
+modeSelector.style.visibility = 'visible';
+}
+else {
+var modeSelector = $('jivePreferredEditorModeLink');
+modeSelector.style.visibility = 'hidden';
+}
+}
+
+if (currentMode == newMode) {
+return;
+}
+
+showEditorWaitImage(true);
+
+if (newMode == "advanced") {
+
+if ($('jive-add-attachment')) {
+$('jive-add-attachment').style.display = "block";
+}
+
+if (currentMode == "" || currentMode == "text") {
+var textarea = $('textEditor');
+WikiTextConverter.convertFromWiki(textarea.value,
+{
+callback: doUpdateAdvancedEditor,
+timeout: DWRTimeout, // 20 seconds
+errorHandler: editorErrorHandler
+}
+);
+}
+else if (currentMode == "preview") {
+showEditor(newMode);
+previousMode = currentMode;
+currentMode = newMode;
+retrieveHTML = false;
+}
+}
+else if (newMode == "text") {
+
+if ($('jive-add-attachment')) {
+$('jive-add-attachment').style.display = "block";
+}
+
+if (currentMode == "advanced") {
+
+
+currentHTML = tinyMCE.getContent('GUIEditor');
+
+currentHTML = jiveCustomCleanup("submit_content", currentHTML);
+
+WikiTextConverter.convertToWiki(currentHTML,
+{
+callback: doUpdateTextEditor,
+timeout: DWRTimeout, // 20 seconds
+errorHandler: editorErrorHandler
+}
+);
+}
+else if (currentMode == "preview" && previousMode == "advanced") {
+
+
+WikiTextConverter.convertToWiki(currentHTML,
+{
+callback: doUpdateTextEditor,
+timeout: DWRTimeout, // 20 seconds
+errorHandler: editorErrorHandler
+}
+);
+}
+else {
+showEditor(newMode);
+setEditorContent(newMode);
+}
+
+}
+else if (newMode == "preview") {
+
+if ($('jive-add-attachment')) {
+$('jive-add-attachment').style.display = "none";
+}
+
+
+if (currentMode == "advanced") {
+
+
+currentHTML = tinyMCE.getContent('GUIEditor');
+
+currentHTML = jiveCustomCleanup("submit_content", currentHTML);
+
+showEditor(newMode);
+WikiTextConverter.convertToPreviewFromXhtml(currentHTML,
+{
+callback: doUpdatePreview,
+timeout: DWRTimeout, // 20 seconds
+errorHandler: editorErrorHandler
+}
+);
+}
+else if (currentMode == "text") {
+var textarea = $('textEditor');
+WikiTextConverter.convertToPreviewFromWiki(textarea.value,
+{
+callback: doUpdatePreview,
+timeout: DWRTimeout, // 20 seconds
+errorHandler: editorErrorHandler
+}
+);
+}
+else {
+showEditorWaitImage(false);
+}
+}
+}
+
+function showEditor(newMode) {
+showEditorWaitImage(false);
+
+if (!advancedModeEnabled) {
+
+var advancedTab = $('wysiwyg-tab');
+if (advancedTab) {
+advancedTab.parentNode.removeChild(advancedTab);
+}
+
+if ("advanced" == newMode) {
+newMode = "text";
+}
+}
+
+var jivetabs = $('editor-tabs');
+
+if (newMode == "advanced") {
+if (currentMode == "") {
+
+currentMode = "advanced";
+setTimeout("showEditor('advanced')", 200);
+}
+else {
+jivetabs.style.display = 'block';
+editorTabs.displayTab('wysiwyg-tab','wysiwyg-panel');
+tinyMCE.addMCEControl($('wysiwyg-panel'), 'GUIEditor');
+}
+
+var wikiHelp = $("jive-markup-help-block");
+if (wikiHelp) {
+wikiHelp.style.display = 'none';
+}
+}
+else if (newMode == "text") {
+if (currentMode == "advanced") {
+tinyMCE.removeMCEControl('GUIEditor');
+
+var advancedPanel = $("wysiwyg-panel");
+advancedPanel.innerHTML = '';
+advancedPanel.style.display = 'none';
+}
+
+try {
+var wikiHelp = $("jive-markup-help-block");
+if (wikiHelp) {
+wikiHelp.style.display = 'block';
+}
+}
+catch (e) {}
+
+
+jivetabs.style.display = 'block';
+editorTabs.displayTab('text-tab','text-panel');
+}
+else if (newMode == "preview") {
+if (currentMode == "advanced") {
+tinyMCE.removeMCEControl('GUIEditor');
+
+var advancedPanel = $("wysiwyg-panel");
+advancedPanel.innerHTML = '';
+advancedPanel.style.display = 'none';
+}
+
+
+jivetabs.style.display = 'block';
+editorTabs.displayTab('preview-tab','preview-panel');
+
+try {
+var wikiHelp = $("jive-markup-help-block");
+if (wikiHelp) {
+wikiHelp.style.display = 'none';
+}
+}
+catch (e) {}
+}
+}
+
+function saveEditorChanges() {
+showEditorWaitImage(true);
+
+var html = "";
+if (currentMode == "advanced") {
+html = tinyMCE.getContent('GUIEditor');
+
+html = jiveCustomCleanup("submit_content", html);
+}
+else if (currentMode == "text") {
+var textarea = $('textEditor');
+html = textarea.value;
+}
+else if (currentMode == "preview") {
+html = currentHTML;
+}
+var textarea = $('textEditor');
+textarea.value = html;
+}
+
+function showEditorWaitImage(flag) {
+var waitImage = $('jiveEditorWaitImage');
+waitImage.style.visibility = (flag ? 'visible' : 'hidden');
+}
+
+var errorHandlerMessage = "An error occurred:";
+
+function editorErrorHandler(message, exception) {
+if (message.indexOf('Timeout') == -1) {
+$('dwr-error-text').innerHTML = errorHandlerMessage + ' Error Code: ' + message;
+Effect.Appear($('dwr-error-table'));
+Effect.Fade($('dwr-error-table'),{delay: 10});
+}
+};
+
+var spellCheckTimeout;
+
+function enableInlineSpellCheck(inlineSpellEnabled) {
+if (!inlineSpellEnabled) {
+return spellForm('textEditor');
+}
+else if (typeof(oSpell) == 'undefined' || !oSpell.supported) {
+return spellForm('textEditor');
+}
+showEditorWaitImage(true);
+
+
+
+var d = $("text-panel-links");
+var d2 = $("jive-resume-after-spell");
+d.style.display = "none";
+d2.style.display = "block"
+
+oSpell.resetMarkup();
+
+
+showEditorWaitImage(false);
+
+return false;
+}
+
+
+function disableInlineSpellCheck(inlineSpellEnabled) {
+if (!inlineSpellEnabled) {
+return false;
+}
+else if (!oSpell.supported) {
+return false;
+}
+
+showEditorWaitImage(true);
+
+
+oSpell.reSyncScroll();
+oSpell.hideMarkup();
+
+
+var d = $("text-panel-links");
+var d2 = $("jive-resume-after-spell");
+d.style.display = "block";
+d2.style.display = "none"
+
+showEditorWaitImage(false);
+
+return false;
+}
+
+function rescanInlineSpellCheck(inlineSpellEnabled) {
+if (!inlineSpellEnabled) {
+return;
+}
+else if (!oSpell.supported) {
+return;
+}
+
+showEditorWaitImage(true);
+oSpell.resetMarkup();
+showEditorWaitImage(false);
+}
+
+function resizeInlineSpellCheck() {
+if (typeof(oSpell) == 'undefined') {
+return;
+}
+
+var w = $('textEditor').offsetWidth;
+
+if (w > 0) {
+$('jive-spell-markup-div').style.width = w + "px";
+}
+}
+
+var insertLinkVisible = false;
+function showInsertLink() {
+if (insertLinkVisible) {
+insertLinkVisible = false;
+new Effect.SlideUp('link-panel')
+} else {
+insertLinkVisible = true;
+$('linkTextID').value = getSelectionRangeText($('textEditor'));
+new Effect.SlideDown('link-panel')
+}
+}
+
+function insertLinkCallback(win) {
+if ((!($('linkURLID').value) || trimString($('linkURLID').value) == '')) {
+new Effect.Appear('link_form_error_msg');
+new Effect.Shake('modal_dialog'); return false;
+}
+else {
+
+var link = " [";
+if ($('linkTextID').value && trimString($('linkTextID').value) != '') {
+link += trimString($('linkTextID').value) + "|";
+}
+
+link +=  trimString($('linkURLID').value);
+link += "] ";
+
+replaceAtCursor(link, $('textEditor'));
+
+if (oSpell) {
+oSpell.resetMarkup();
+}
+
+$('linkURLID').value = '';
+$('linkTextID').value = '';
+insertLinkVisible = false;
+new Effect.SlideUp('link-panel');
+
+return true;
+}
+}
+
+function insertLinkCancelCallback(win) {
+$('link_form_error_msg').style.display = "none";
+insertLinkVisible = false;
+new Effect.SlideUp('link-panel')
+return true;
+}
+
+function trimString(s) {
+s.replace(/^\s*|\s*$/g, "");
+return s;
+}
+
+var __postSubmitted = false;
+var cancelPost = false;
+
+function validatePost() {
+if (cancelPost) {
+return true;
+}
+
+var hasError = false;
+
+
+var sub = document.getElementById('subject01');
+if (typeof(sub) != "undefined" && trimString(sub.value) == '') {
+
+var t = document.getElementById('post-error-table');
+if (t) {
+t.style.display = "block";
+t = document.getElementById('post-error-subject');
+if (t) {
+t.style.display = "block";
+}
+}
+hasError = true;
+}
+else {
+var t = document.getElementById('post-error-subject');
+if (t) {
+t.style.display = "none";
+}
+}
+
+if (currentMode == "preview" && previousMode == "advanced") {
+
+document.getElementById('textEditor').value = jiveCustomCleanup("submit_content", currentHTML);
+
+
+document.getElementById('postTypeFlag').value = "true";
+
+var t = document.getElementById('post-error-body');
+if (t) {
+t.style.display = "none";
+}
+}
+else if (getEditorMode() == "text" || getEditorMode() == "preview") {
+var body = document.getElementById('textEditor');
+if (typeof(body) != "undefined" && trimString(body.value) == '') {
+
+var t = document.getElementById('post-error-table');
+if (t) {
+t.style.display = "block";
+t = document.getElementById('post-error-body');
+if (t) {
+t.style.display = "block";
+}
+}
+hasError = true;
+}
+else {
+var t = document.getElementById('post-error-body');
+if (t) {
+t.style.display = "none";
+}
+}
+}
+else {
+var body = tinyMCE.getContent('GUIEditor');
+
+body = jiveCustomCleanup("submit_content", body);
+
+if (body == null || trimString(body) == '') {
+
+var t = document.getElementById('post-error-table');
+if (t) {
+t.style.display = "block";
+t = document.getElementById('post-error-body');
+if (t) {
+t.style.display = "block";
+}
+}
+hasError = true;
+}
+else {
+
+document.getElementById('textEditor').value = body;
+
+document.getElementById('postTypeFlag').value = "true";
+
+var t = document.getElementById('post-error-body');
+if (t) {
+t.style.display = "none";
+}
+}
+}
+
+if (hasError) {
+return false;
+}
+
+
+var t = document.getElementById('post-error-table');
+if (t) {
+t.style.display = "none";
+}
+
+if (arguments.length > 0) {
+window.onbeforeunload = null;
+}
+
+if (typeof(autoSave) != "undefined" && autosave != null) {
+Event.stopObserving(window, 'unload', autoSave.doDiscard, false);
+}
+
+if (!__postSubmitted) {
+__postSubmitted = true;
+return true;
+}
+return false;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var Scriptaculous = {
+Version: '1.7.0',
+require: function(libraryName) {
+
+document.write('<script type="text/javascript" src="'+libraryName+'"></script>');
+},
+load: function() {
+if((typeof Prototype=='undefined') ||
+(typeof Element == 'undefined') ||
+(typeof Element.Methods=='undefined') ||
+parseFloat(Prototype.Version.split(".")[0] + "." +
+Prototype.Version.split(".")[1]) < 1.5)
+throw("script.aculo.us requires the Prototype JavaScript framework >= 1.5.0");
+
+$A(document.getElementsByTagName("script")).findAll( function(s) {
+return (s.src && s.src.match(/scriptaculous\.js(\?.*)?$/))
+}).each( function(s) {
+var path = s.src.replace(/scriptaculous\.js(\?.*)?$/,'');
+var includes = s.src.match(/\?.*load=([a-z,]*)/);
+(includes ? includes[1] : 'builder,effects,dragdrop,controls,slider').split(',').each(
+function(include) { Scriptaculous.require(path+include+'.js') });
+});
+}
+}
+
+Scriptaculous.load();
+
+
+
+
+
+
+
+
+
+
+
+
+
+String.prototype.parseColor = function() {
+var color = '#';
+if(this.slice(0,4) == 'rgb(') {
+var cols = this.slice(4,this.length-1).split(',');
+var i=0; do { color += parseInt(cols[i]).toColorPart() } while (++i<3);
+} else {
+if(this.slice(0,1) == '#') {
+if(this.length==4) for(var i=1;i<4;i++) color += (this.charAt(i) + this.charAt(i)).toLowerCase();
+if(this.length==7) color = this.toLowerCase();
+}
+}
+return(color.length==7 ? color : (arguments[0] || this));
+}
+
+
+
+Element.collectTextNodes = function(element) {
+return $A($(element).childNodes).collect( function(node) {
+return (node.nodeType==3 ? node.nodeValue :
+(node.hasChildNodes() ? Element.collectTextNodes(node) : ''));
+}).flatten().join('');
+}
+
+Element.collectTextNodesIgnoreClass = function(element, className) {
+return $A($(element).childNodes).collect( function(node) {
+return (node.nodeType==3 ? node.nodeValue :
+((node.hasChildNodes() && !Element.hasClassName(node,className)) ?
+Element.collectTextNodesIgnoreClass(node, className) : ''));
+}).flatten().join('');
+}
+
+Element.setContentZoom = function(element, percent) {
+element = $(element);
+element.setStyle({fontSize: (percent/100) + 'em'});
+if(navigator.appVersion.indexOf('AppleWebKit')>0) window.scrollBy(0,0);
+return element;
+}
+
+Element.getOpacity = function(element){
+return $(element).getStyle('opacity');
+}
+
+Element.setOpacity = function(element, value){
+return $(element).setStyle({opacity:value});
+}
+
+Element.getInlineOpacity = function(element){
+return $(element).style.opacity || '';
+}
+
+Element.forceRerendering = function(element) {
+try {
+element = $(element);
+var n = document.createTextNode(' ');
+element.appendChild(n);
+element.removeChild(n);
+} catch(e) { }
+};
+
+
+
+Array.prototype.call = function() {
+var args = arguments;
+this.each(function(f){ f.apply(this, args) });
+}
+
+
+
+var Effect = {
+_elementDoesNotExistError: {
+name: 'ElementDoesNotExistError',
+message: 'The specified DOM element does not exist, but is required for this effect to operate'
+},
+tagifyText: function(element) {
+if(typeof Builder == 'undefined')
+throw("Effect.tagifyText requires including script.aculo.us' builder.js library");
+
+var tagifyStyle = 'position:relative';
+if(/MSIE/.test(navigator.userAgent) && !window.opera) tagifyStyle += ';zoom:1';
+
+element = $(element);
+$A(element.childNodes).each( function(child) {
+if(child.nodeType==3) {
+child.nodeValue.toArray().each( function(character) {
+element.insertBefore(
+Builder.node('span',{style: tagifyStyle},
+character == ' ' ? String.fromCharCode(160) : character),
+child);
+});
+Element.remove(child);
+}
+});
+},
+multiple: function(element, effect) {
+var elements;
+if(((typeof element == 'object') ||
+(typeof element == 'function')) &&
+(element.length))
+elements = element;
+else
+elements = $(element).childNodes;
+
+var options = Object.extend({
+speed: 0.1,
+delay: 0.0
+}, arguments[2] || {});
+var masterDelay = options.delay;
+
+$A(elements).each( function(element, index) {
+new effect(element, Object.extend(options, { delay: index * options.speed + masterDelay }));
+});
+},
+PAIRS: {
+'slide':  ['SlideDown','SlideUp'],
+'blind':  ['BlindDown','BlindUp'],
+'appear': ['Appear','Fade']
+},
+toggle: function(element, effect) {
+element = $(element);
+effect = (effect || 'appear').toLowerCase();
+var options = Object.extend({
+queue: { position:'end', scope:(element.id || 'global'), limit: 1 }
+}, arguments[2] || {});
+Effect[element.visible() ?
+Effect.PAIRS[effect][1] : Effect.PAIRS[effect][0]](element, options);
+}
+};
+
+var Effect2 = Effect; // deprecated
+
+
+
+Effect.Transitions = {
+linear: Prototype.K,
+sinoidal: function(pos) {
+return (-Math.cos(pos*Math.PI)/2) + 0.5;
+},
+reverse: function(pos) {
+return 1-pos;
+},
+flicker: function(pos) {
+return ((-Math.cos(pos*Math.PI)/4) + 0.75) + Math.random()/4;
+},
+wobble: function(pos) {
+return (-Math.cos(pos*Math.PI*(9*pos))/2) + 0.5;
+},
+pulse: function(pos, pulses) {
+pulses = pulses || 5;
+return (
+Math.round((pos % (1/pulses)) * pulses) == 0 ?
+((pos * pulses * 2) - Math.floor(pos * pulses * 2)) :
+1 - ((pos * pulses * 2) - Math.floor(pos * pulses * 2))
+);
+},
+none: function(pos) {
+return 0;
+},
+full: function(pos) {
+return 1;
+}
+};
+
+
+
+Effect.ScopedQueue = Class.create();
+Object.extend(Object.extend(Effect.ScopedQueue.prototype, Enumerable), {
+initialize: function() {
+this.effects  = [];
+this.interval = null;
+},
+_each: function(iterator) {
+this.effects._each(iterator);
+},
+add: function(effect) {
+var timestamp = new Date().getTime();
+
+var position = (typeof effect.options.queue == 'string') ?
+effect.options.queue : effect.options.queue.position;
+
+switch(position) {
+case 'front':
+
+this.effects.findAll(function(e){ return e.state=='idle' }).each( function(e) {
+e.startOn  += effect.finishOn;
+e.finishOn += effect.finishOn;
+});
+break;
+case 'with-last':
+timestamp = this.effects.pluck('startOn').max() || timestamp;
+break;
+case 'end':
+
+timestamp = this.effects.pluck('finishOn').max() || timestamp;
+break;
+}
+
+effect.startOn  += timestamp;
+effect.finishOn += timestamp;
+
+if(!effect.options.queue.limit || (this.effects.length < effect.options.queue.limit))
+this.effects.push(effect);
+
+if(!this.interval)
+this.interval = setInterval(this.loop.bind(this), 15);
+},
+remove: function(effect) {
+this.effects = this.effects.reject(function(e) { return e==effect });
+if(this.effects.length == 0) {
+clearInterval(this.interval);
+this.interval = null;
+}
+},
+loop: function() {
+var timePos = new Date().getTime();
+for(var i=0, len=this.effects.length;i<len;i++)
+if(this.effects[i]) this.effects[i].loop(timePos);
+}
+});
+
+Effect.Queues = {
+instances: $H(),
+get: function(queueName) {
+if(typeof queueName != 'string') return queueName;
+
+if(!this.instances[queueName])
+this.instances[queueName] = new Effect.ScopedQueue();
+
+return this.instances[queueName];
+}
+}
+Effect.Queue = Effect.Queues.get('global');
+
+Effect.DefaultOptions = {
+transition: Effect.Transitions.sinoidal,
+duration:   1.0,   // seconds
+fps:        60.0,  // max. 60fps due to Effect.Queue implementation
+sync:       false, // true for combining
+from:       0.0,
+to:         1.0,
+delay:      0.0,
+queue:      'parallel'
+}
+
+Effect.Base = function() {};
+Effect.Base.prototype = {
+position: null,
+start: function(options) {
+this.options      = Object.extend(Object.extend({},Effect.DefaultOptions), options || {});
+this.currentFrame = 0;
+this.state        = 'idle';
+this.startOn      = this.options.delay*1000;
+this.finishOn     = this.startOn + (this.options.duration*1000);
+this.event('beforeStart');
+if(!this.options.sync)
+Effect.Queues.get(typeof this.options.queue == 'string' ?
+'global' : this.options.queue.scope).add(this);
+},
+loop: function(timePos) {
+if(timePos >= this.startOn) {
+if(timePos >= this.finishOn) {
+this.render(1.0);
+this.cancel();
+this.event('beforeFinish');
+if(this.finish) this.finish();
+this.event('afterFinish');
+return;
+}
+var pos   = (timePos - this.startOn) / (this.finishOn - this.startOn);
+var frame = Math.round(pos * this.options.fps * this.options.duration);
+if(frame > this.currentFrame) {
+this.render(pos);
+this.currentFrame = frame;
+}
+}
+},
+render: function(pos) {
+if(this.state == 'idle') {
+this.state = 'running';
+this.event('beforeSetup');
+if(this.setup) this.setup();
+this.event('afterSetup');
+}
+if(this.state == 'running') {
+if(this.options.transition) pos = this.options.transition(pos);
+pos *= (this.options.to-this.options.from);
+pos += this.options.from;
+this.position = pos;
+this.event('beforeUpdate');
+if(this.update) this.update(pos);
+this.event('afterUpdate');
+}
+},
+cancel: function() {
+if(!this.options.sync)
+Effect.Queues.get(typeof this.options.queue == 'string' ?
+'global' : this.options.queue.scope).remove(this);
+this.state = 'finished';
+},
+event: function(eventName) {
+if(this.options[eventName + 'Internal']) this.options[eventName + 'Internal'](this);
+if(this.options[eventName]) this.options[eventName](this);
+},
+inspect: function() {
+var data = $H();
+for(property in this)
+if(typeof this[property] != 'function') data[property] = this[property];
+return '#<Effect:' + data.inspect() + ',options:' + $H(this.options).inspect() + '>';
+}
+}
+
+Effect.Parallel = Class.create();
+Object.extend(Object.extend(Effect.Parallel.prototype, Effect.Base.prototype), {
+initialize: function(effects) {
+this.effects = effects || [];
+this.start(arguments[1]);
+},
+update: function(position) {
+this.effects.invoke('render', position);
+},
+finish: function(position) {
+this.effects.each( function(effect) {
+effect.render(1.0);
+effect.cancel();
+effect.event('beforeFinish');
+if(effect.finish) effect.finish(position);
+effect.event('afterFinish');
+});
+}
+});
+
+Effect.Event = Class.create();
+Object.extend(Object.extend(Effect.Event.prototype, Effect.Base.prototype), {
+initialize: function() {
+var options = Object.extend({
+duration: 0
+}, arguments[0] || {});
+this.start(options);
+},
+update: Prototype.emptyFunction
+});
+
+Effect.Opacity = Class.create();
+Object.extend(Object.extend(Effect.Opacity.prototype, Effect.Base.prototype), {
+initialize: function(element) {
+this.element = $(element);
+if(!this.element) throw(Effect._elementDoesNotExistError);
+
+if(/MSIE/.test(navigator.userAgent) && !window.opera && (!this.element.currentStyle.hasLayout))
+this.element.setStyle({zoom: 1});
+var options = Object.extend({
+from: this.element.getOpacity() || 0.0,
+to:   1.0
+}, arguments[1] || {});
+this.start(options);
+},
+update: function(position) {
+this.element.setOpacity(position);
+}
+});
+
+Effect.Move = Class.create();
+Object.extend(Object.extend(Effect.Move.prototype, Effect.Base.prototype), {
+initialize: function(element) {
+this.element = $(element);
+if(!this.element) throw(Effect._elementDoesNotExistError);
+var options = Object.extend({
+x:    0,
+y:    0,
+mode: 'relative'
+}, arguments[1] || {});
+this.start(options);
+},
+setup: function() {
+
+
+
+
+this.element.makePositioned();
+this.originalLeft = parseFloat(this.element.getStyle('left') || '0');
+this.originalTop  = parseFloat(this.element.getStyle('top')  || '0');
+if(this.options.mode == 'absolute') {
+
+this.options.x = this.options.x - this.originalLeft;
+this.options.y = this.options.y - this.originalTop;
+}
+},
+update: function(position) {
+this.element.setStyle({
+left: Math.round(this.options.x  * position + this.originalLeft) + 'px',
+top:  Math.round(this.options.y  * position + this.originalTop)  + 'px'
+});
+}
+});
+
+
+Effect.MoveBy = function(element, toTop, toLeft) {
+return new Effect.Move(element,
+Object.extend({ x: toLeft, y: toTop }, arguments[3] || {}));
+};
+
+Effect.Scale = Class.create();
+Object.extend(Object.extend(Effect.Scale.prototype, Effect.Base.prototype), {
+initialize: function(element, percent) {
+this.element = $(element);
+if(!this.element) throw(Effect._elementDoesNotExistError);
+var options = Object.extend({
+scaleX: true,
+scaleY: true,
+scaleContent: true,
+scaleFromCenter: false,
+scaleMode: 'box',        // 'box' or 'contents' or {} with provided values
+scaleFrom: 100.0,
+scaleTo:   percent
+}, arguments[2] || {});
+this.start(options);
+},
+setup: function() {
+this.restoreAfterFinish = this.options.restoreAfterFinish || false;
+this.elementPositioning = this.element.getStyle('position');
+
+this.originalStyle = {};
+['top','left','width','height','fontSize'].each( function(k) {
+this.originalStyle[k] = this.element.style[k];
+}.bind(this));
+
+this.originalTop  = this.element.offsetTop;
+this.originalLeft = this.element.offsetLeft;
+
+var fontSize = this.element.getStyle('font-size') || '100%';
+['em','px','%','pt'].each( function(fontSizeType) {
+if(fontSize.indexOf(fontSizeType)>0) {
+this.fontSize     = parseFloat(fontSize);
+this.fontSizeType = fontSizeType;
+}
+}.bind(this));
+
+this.factor = (this.options.scaleTo - this.options.scaleFrom)/100;
+
+this.dims = null;
+if(this.options.scaleMode=='box')
+this.dims = [this.element.offsetHeight, this.element.offsetWidth];
+if(/^content/.test(this.options.scaleMode))
+this.dims = [this.element.scrollHeight, this.element.scrollWidth];
+if(!this.dims)
+this.dims = [this.options.scaleMode.originalHeight,
+this.options.scaleMode.originalWidth];
+},
+update: function(position) {
+var currentScale = (this.options.scaleFrom/100.0) + (this.factor * position);
+if(this.options.scaleContent && this.fontSize)
+this.element.setStyle({fontSize: this.fontSize * currentScale + this.fontSizeType });
+this.setDimensions(this.dims[0] * currentScale, this.dims[1] * currentScale);
+},
+finish: function(position) {
+if(this.restoreAfterFinish) this.element.setStyle(this.originalStyle);
+},
+setDimensions: function(height, width) {
+var d = {};
+if(this.options.scaleX) d.width = Math.round(width) + 'px';
+if(this.options.scaleY) d.height = Math.round(height) + 'px';
+if(this.options.scaleFromCenter) {
+var topd  = (height - this.dims[0])/2;
+var leftd = (width  - this.dims[1])/2;
+if(this.elementPositioning == 'absolute') {
+if(this.options.scaleY) d.top = this.originalTop-topd + 'px';
+if(this.options.scaleX) d.left = this.originalLeft-leftd + 'px';
+} else {
+if(this.options.scaleY) d.top = -topd + 'px';
+if(this.options.scaleX) d.left = -leftd + 'px';
+}
+}
+this.element.setStyle(d);
+}
+});
+
+Effect.Highlight = Class.create();
+Object.extend(Object.extend(Effect.Highlight.prototype, Effect.Base.prototype), {
+initialize: function(element) {
+this.element = $(element);
+if(!this.element) throw(Effect._elementDoesNotExistError);
+var options = Object.extend({ startcolor: '#ffff99' }, arguments[1] || {});
+this.start(options);
+},
+setup: function() {
+
+if(this.element.getStyle('display')=='none') { this.cancel(); return; }
+
+this.oldStyle = {};
+if (!this.options.keepBackgroundImage) {
+this.oldStyle.backgroundImage = this.element.getStyle('background-image');
+this.element.setStyle({backgroundImage: 'none'});
+}
+if(!this.options.endcolor)
+this.options.endcolor = this.element.getStyle('background-color').parseColor('#ffffff');
+if(!this.options.restorecolor)
+this.options.restorecolor = this.element.getStyle('background-color');
+
+this._base  = $R(0,2).map(function(i){ return parseInt(this.options.startcolor.slice(i*2+1,i*2+3),16) }.bind(this));
+this._delta = $R(0,2).map(function(i){ return parseInt(this.options.endcolor.slice(i*2+1,i*2+3),16)-this._base[i] }.bind(this));
+},
+update: function(position) {
+this.element.setStyle({backgroundColor: $R(0,2).inject('#',function(m,v,i){
+return m+(Math.round(this._base[i]+(this._delta[i]*position)).toColorPart()); }.bind(this)) });
+},
+finish: function() {
+this.element.setStyle(Object.extend(this.oldStyle, {
+backgroundColor: this.options.restorecolor
+}));
+}
+});
+
+Effect.ScrollTo = Class.create();
+Object.extend(Object.extend(Effect.ScrollTo.prototype, Effect.Base.prototype), {
+initialize: function(element) {
+this.element = $(element);
+this.start(arguments[1] || {});
+},
+setup: function() {
+Position.prepare();
+var offsets = Position.cumulativeOffset(this.element);
+if(this.options.offset) offsets[1] += this.options.offset;
+var max = window.innerHeight ?
+window.height - window.innerHeight :
+document.body.scrollHeight -
+(document.documentElement.clientHeight ?
+document.documentElement.clientHeight : document.body.clientHeight);
+this.scrollStart = Position.deltaY;
+this.delta = (offsets[1] > max ? max : offsets[1]) - this.scrollStart;
+},
+update: function(position) {
+Position.prepare();
+window.scrollTo(Position.deltaX,
+this.scrollStart + (position*this.delta));
+}
+});
+
+
+
+Effect.Fade = function(element) {
+element = $(element);
+var oldOpacity = element.getInlineOpacity();
+var options = Object.extend({
+from: element.getOpacity() || 1.0,
+to:   0.0,
+afterFinishInternal: function(effect) {
+if(effect.options.to!=0) return;
+effect.element.hide().setStyle({opacity: oldOpacity});
+}}, arguments[1] || {});
+return new Effect.Opacity(element,options);
+}
+
+Effect.Appear = function(element) {
+element = $(element);
+var options = Object.extend({
+from: (element.getStyle('display') == 'none' ? 0.0 : element.getOpacity() || 0.0),
+to:   1.0,
+
+afterFinishInternal: function(effect) {
+effect.element.forceRerendering();
+},
+beforeSetup: function(effect) {
+effect.element.setOpacity(effect.options.from).show();
+}}, arguments[1] || {});
+return new Effect.Opacity(element,options);
+}
+
+Effect.Puff = function(element) {
+element = $(element);
+var oldStyle = {
+opacity: element.getInlineOpacity(),
+position: element.getStyle('position'),
+top:  element.style.top,
+left: element.style.left,
+width: element.style.width,
+height: element.style.height
+};
+return new Effect.Parallel(
+[ new Effect.Scale(element, 200,
+{ sync: true, scaleFromCenter: true, scaleContent: true, restoreAfterFinish: true }),
+new Effect.Opacity(element, { sync: true, to: 0.0 } ) ],
+Object.extend({ duration: 1.0,
+beforeSetupInternal: function(effect) {
+Position.absolutize(effect.effects[0].element)
+},
+afterFinishInternal: function(effect) {
+effect.effects[0].element.hide().setStyle(oldStyle); }
+}, arguments[1] || {})
+);
+}
+
+Effect.BlindUp = function(element) {
+element = $(element);
+element.makeClipping();
+return new Effect.Scale(element, 0,
+Object.extend({ scaleContent: false,
+scaleX: false,
+restoreAfterFinish: true,
+afterFinishInternal: function(effect) {
+effect.element.hide().undoClipping();
+}
+}, arguments[1] || {})
+);
+}
+
+Effect.BlindDown = function(element) {
+element = $(element);
+var elementDimensions = element.getDimensions();
+return new Effect.Scale(element, 100, Object.extend({
+scaleContent: false,
+scaleX: false,
+scaleFrom: 0,
+scaleMode: {originalHeight: elementDimensions.height, originalWidth: elementDimensions.width},
+restoreAfterFinish: true,
+afterSetup: function(effect) {
+effect.element.makeClipping().setStyle({height: '0px'}).show();
+},
+afterFinishInternal: function(effect) {
+effect.element.undoClipping();
+}
+}, arguments[1] || {}));
+}
+
+Effect.SwitchOff = function(element) {
+element = $(element);
+var oldOpacity = element.getInlineOpacity();
+return new Effect.Appear(element, Object.extend({
+duration: 0.4,
+from: 0,
+transition: Effect.Transitions.flicker,
+afterFinishInternal: function(effect) {
+new Effect.Scale(effect.element, 1, {
+duration: 0.3, scaleFromCenter: true,
+scaleX: false, scaleContent: false, restoreAfterFinish: true,
+beforeSetup: function(effect) {
+effect.element.makePositioned().makeClipping();
+},
+afterFinishInternal: function(effect) {
+effect.element.hide().undoClipping().undoPositioned().setStyle({opacity: oldOpacity});
+}
+})
+}
+}, arguments[1] || {}));
+}
+
+Effect.DropOut = function(element) {
+element = $(element);
+var oldStyle = {
+top: element.getStyle('top'),
+left: element.getStyle('left'),
+opacity: element.getInlineOpacity() };
+return new Effect.Parallel(
+[ new Effect.Move(element, {x: 0, y: 100, sync: true }),
+new Effect.Opacity(element, { sync: true, to: 0.0 }) ],
+Object.extend(
+{ duration: 0.5,
+beforeSetup: function(effect) {
+effect.effects[0].element.makePositioned();
+},
+afterFinishInternal: function(effect) {
+effect.effects[0].element.hide().undoPositioned().setStyle(oldStyle);
+}
+}, arguments[1] || {}));
+}
+
+Effect.Shake = function(element) {
+element = $(element);
+var oldStyle = {
+top: element.getStyle('top'),
+left: element.getStyle('left') };
+return new Effect.Move(element,
+{ x:  20, y: 0, duration: 0.05, afterFinishInternal: function(effect) {
+new Effect.Move(effect.element,
+{ x: -40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
+new Effect.Move(effect.element,
+{ x:  40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
+new Effect.Move(effect.element,
+{ x: -40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
+new Effect.Move(effect.element,
+{ x:  40, y: 0, duration: 0.1,  afterFinishInternal: function(effect) {
+new Effect.Move(effect.element,
+{ x: -20, y: 0, duration: 0.05, afterFinishInternal: function(effect) {
+effect.element.undoPositioned().setStyle(oldStyle);
+}}) }}) }}) }}) }}) }});
+}
+
+Effect.SlideDown = function(element) {
+element = $(element).cleanWhitespace();
+
+var oldInnerBottom = element.down().getStyle('bottom');
+var elementDimensions = element.getDimensions();
+return new Effect.Scale(element, 100, Object.extend({
+scaleContent: false,
+scaleX: false,
+scaleFrom: window.opera ? 0 : 1,
+scaleMode: {originalHeight: elementDimensions.height, originalWidth: elementDimensions.width},
+restoreAfterFinish: true,
+afterSetup: function(effect) {
+effect.element.makePositioned();
+effect.element.down().makePositioned();
+if(window.opera) effect.element.setStyle({top: ''});
+effect.element.makeClipping().setStyle({height: '0px'}).show();
+},
+afterUpdateInternal: function(effect) {
+effect.element.down().setStyle({bottom:
+(effect.dims[0] - effect.element.clientHeight) + 'px' });
+},
+afterFinishInternal: function(effect) {
+effect.element.undoClipping().undoPositioned();
+effect.element.down().undoPositioned().setStyle({bottom: oldInnerBottom}); }
+}, arguments[1] || {})
+);
+}
+
+Effect.SlideUp = function(element) {
+element = $(element).cleanWhitespace();
+var oldInnerBottom = element.down().getStyle('bottom');
+return new Effect.Scale(element, window.opera ? 0 : 1,
+Object.extend({ scaleContent: false,
+scaleX: false,
+scaleMode: 'box',
+scaleFrom: 100,
+restoreAfterFinish: true,
+beforeStartInternal: function(effect) {
+effect.element.makePositioned();
+effect.element.down().makePositioned();
+if(window.opera) effect.element.setStyle({top: ''});
+effect.element.makeClipping().show();
+},
+afterUpdateInternal: function(effect) {
+effect.element.down().setStyle({bottom:
+(effect.dims[0] - effect.element.clientHeight) + 'px' });
+},
+afterFinishInternal: function(effect) {
+effect.element.hide().undoClipping().undoPositioned().setStyle({bottom: oldInnerBottom});
+effect.element.down().undoPositioned();
+}
+}, arguments[1] || {})
+);
+}
+
+
+Effect.Squish = function(element) {
+return new Effect.Scale(element, window.opera ? 1 : 0, {
+restoreAfterFinish: true,
+beforeSetup: function(effect) {
+effect.element.makeClipping();
+},
+afterFinishInternal: function(effect) {
+effect.element.hide().undoClipping();
+}
+});
+}
+
+Effect.Grow = function(element) {
+element = $(element);
+var options = Object.extend({
+direction: 'center',
+moveTransition: Effect.Transitions.sinoidal,
+scaleTransition: Effect.Transitions.sinoidal,
+opacityTransition: Effect.Transitions.full
+}, arguments[1] || {});
+var oldStyle = {
+top: element.style.top,
+left: element.style.left,
+height: element.style.height,
+width: element.style.width,
+opacity: element.getInlineOpacity() };
+
+var dims = element.getDimensions();
+var initialMoveX, initialMoveY;
+var moveX, moveY;
+
+switch (options.direction) {
+case 'top-left':
+initialMoveX = initialMoveY = moveX = moveY = 0;
+break;
+case 'top-right':
+initialMoveX = dims.width;
+initialMoveY = moveY = 0;
+moveX = -dims.width;
+break;
+case 'bottom-left':
+initialMoveX = moveX = 0;
+initialMoveY = dims.height;
+moveY = -dims.height;
+break;
+case 'bottom-right':
+initialMoveX = dims.width;
+initialMoveY = dims.height;
+moveX = -dims.width;
+moveY = -dims.height;
+break;
+case 'center':
+initialMoveX = dims.width / 2;
+initialMoveY = dims.height / 2;
+moveX = -dims.width / 2;
+moveY = -dims.height / 2;
+break;
+}
+
+return new Effect.Move(element, {
+x: initialMoveX,
+y: initialMoveY,
+duration: 0.01,
+beforeSetup: function(effect) {
+effect.element.hide().makeClipping().makePositioned();
+},
+afterFinishInternal: function(effect) {
+new Effect.Parallel(
+[ new Effect.Opacity(effect.element, { sync: true, to: 1.0, from: 0.0, transition: options.opacityTransition }),
+new Effect.Move(effect.element, { x: moveX, y: moveY, sync: true, transition: options.moveTransition }),
+new Effect.Scale(effect.element, 100, {
+scaleMode: { originalHeight: dims.height, originalWidth: dims.width },
+sync: true, scaleFrom: window.opera ? 1 : 0, transition: options.scaleTransition, restoreAfterFinish: true})
+], Object.extend({
+beforeSetup: function(effect) {
+effect.effects[0].element.setStyle({height: '0px'}).show();
+},
+afterFinishInternal: function(effect) {
+effect.effects[0].element.undoClipping().undoPositioned().setStyle(oldStyle);
+}
+}, options)
+)
+}
+});
+}
+
+Effect.Shrink = function(element) {
+element = $(element);
+var options = Object.extend({
+direction: 'center',
+moveTransition: Effect.Transitions.sinoidal,
+scaleTransition: Effect.Transitions.sinoidal,
+opacityTransition: Effect.Transitions.none
+}, arguments[1] || {});
+var oldStyle = {
+top: element.style.top,
+left: element.style.left,
+height: element.style.height,
+width: element.style.width,
+opacity: element.getInlineOpacity() };
+
+var dims = element.getDimensions();
+var moveX, moveY;
+
+switch (options.direction) {
+case 'top-left':
+moveX = moveY = 0;
+break;
+case 'top-right':
+moveX = dims.width;
+moveY = 0;
+break;
+case 'bottom-left':
+moveX = 0;
+moveY = dims.height;
+break;
+case 'bottom-right':
+moveX = dims.width;
+moveY = dims.height;
+break;
+case 'center':
+moveX = dims.width / 2;
+moveY = dims.height / 2;
+break;
+}
+
+return new Effect.Parallel(
+[ new Effect.Opacity(element, { sync: true, to: 0.0, from: 1.0, transition: options.opacityTransition }),
+new Effect.Scale(element, window.opera ? 1 : 0, { sync: true, transition: options.scaleTransition, restoreAfterFinish: true}),
+new Effect.Move(element, { x: moveX, y: moveY, sync: true, transition: options.moveTransition })
+], Object.extend({
+beforeStartInternal: function(effect) {
+effect.effects[0].element.makePositioned().makeClipping();
+},
+afterFinishInternal: function(effect) {
+effect.effects[0].element.hide().undoClipping().undoPositioned().setStyle(oldStyle); }
+}, options)
+);
+}
+
+Effect.Pulsate = function(element) {
+element = $(element);
+var options    = arguments[1] || {};
+var oldOpacity = element.getInlineOpacity();
+var transition = options.transition || Effect.Transitions.sinoidal;
+var reverser   = function(pos){ return transition(1-Effect.Transitions.pulse(pos, options.pulses)) };
+reverser.bind(transition);
+return new Effect.Opacity(element,
+Object.extend(Object.extend({  duration: 2.0, from: 0,
+afterFinishInternal: function(effect) { effect.element.setStyle({opacity: oldOpacity}); }
+}, options), {transition: reverser}));
+}
+
+Effect.Fold = function(element) {
+element = $(element);
+var oldStyle = {
+top: element.style.top,
+left: element.style.left,
+width: element.style.width,
+height: element.style.height };
+element.makeClipping();
+return new Effect.Scale(element, 5, Object.extend({
+scaleContent: false,
+scaleX: false,
+afterFinishInternal: function(effect) {
+new Effect.Scale(element, 1, {
+scaleContent: false,
+scaleY: false,
+afterFinishInternal: function(effect) {
+effect.element.hide().undoClipping().setStyle(oldStyle);
+} });
+}}, arguments[1] || {}));
+};
+
+Effect.Morph = Class.create();
+Object.extend(Object.extend(Effect.Morph.prototype, Effect.Base.prototype), {
+initialize: function(element) {
+this.element = $(element);
+if(!this.element) throw(Effect._elementDoesNotExistError);
+var options = Object.extend({
+style: {}
+}, arguments[1] || {});
+if (typeof options.style == 'string') {
+if(options.style.indexOf(':') == -1) {
+var cssText = '', selector = '.' + options.style;
+$A(document.styleSheets).reverse().each(function(styleSheet) {
+if (styleSheet.cssRules) cssRules = styleSheet.cssRules;
+else if (styleSheet.rules) cssRules = styleSheet.rules;
+$A(cssRules).reverse().each(function(rule) {
+if (selector == rule.selectorText) {
+cssText = rule.style.cssText;
+throw $break;
+}
+});
+if (cssText) throw $break;
+});
+this.style = cssText.parseStyle();
+options.afterFinishInternal = function(effect){
+effect.element.addClassName(effect.options.style);
+effect.transforms.each(function(transform) {
+if(transform.style != 'opacity')
+effect.element.style[transform.style.camelize()] = '';
+});
+}
+} else this.style = options.style.parseStyle();
+} else this.style = $H(options.style)
+this.start(options);
+},
+setup: function(){
+function parseColor(color){
+if(!color || ['rgba(0, 0, 0, 0)','transparent'].include(color)) color = '#ffffff';
+color = color.parseColor();
+return $R(0,2).map(function(i){
+return parseInt( color.slice(i*2+1,i*2+3), 16 )
+});
+}
+this.transforms = this.style.map(function(pair){
+var property = pair[0].underscore().dasherize(), value = pair[1], unit = null;
+
+if(value.parseColor('#zzzzzz') != '#zzzzzz') {
+value = value.parseColor();
+unit  = 'color';
+} else if(property == 'opacity') {
+value = parseFloat(value);
+if(/MSIE/.test(navigator.userAgent) && !window.opera && (!this.element.currentStyle.hasLayout))
+this.element.setStyle({zoom: 1});
+} else if(Element.CSS_LENGTH.test(value))
+var components = value.match(/^([\+\-]?[0-9\.]+)(.*)$/),
+value = parseFloat(components[1]), unit = (components.length == 3) ? components[2] : null;
+
+var originalValue = this.element.getStyle(property);
+return $H({
+style: property,
+originalValue: unit=='color' ? parseColor(originalValue) : parseFloat(originalValue || 0),
+targetValue: unit=='color' ? parseColor(value) : value,
+unit: unit
+});
+}.bind(this)).reject(function(transform){
+return (
+(transform.originalValue == transform.targetValue) ||
+(
+transform.unit != 'color' &&
+(isNaN(transform.originalValue) || isNaN(transform.targetValue))
+)
+)
+});
+},
+update: function(position) {
+var style = $H(), value = null;
+this.transforms.each(function(transform){
+value = transform.unit=='color' ?
+$R(0,2).inject('#',function(m,v,i){
+return m+(Math.round(transform.originalValue[i]+
+(transform.targetValue[i] - transform.originalValue[i])*position)).toColorPart() }) :
+transform.originalValue + Math.round(
+((transform.targetValue - transform.originalValue) * position) * 1000)/1000 + transform.unit;
+style[transform.style] = value;
+});
+this.element.setStyle(style);
+}
+});
+
+Effect.Transform = Class.create();
+Object.extend(Effect.Transform.prototype, {
+initialize: function(tracks){
+this.tracks  = [];
+this.options = arguments[1] || {};
+this.addTracks(tracks);
+},
+addTracks: function(tracks){
+tracks.each(function(track){
+var data = $H(track).values().first();
+this.tracks.push($H({
+ids:     $H(track).keys().first(),
+effect:  Effect.Morph,
+options: { style: data }
+}));
+}.bind(this));
+return this;
+},
+play: function(){
+return new Effect.Parallel(
+this.tracks.map(function(track){
+var elements = [$(track.ids) || $$(track.ids)].flatten();
+return elements.map(function(e){ return new track.effect(e, Object.extend({ sync:true }, track.options)) });
+}).flatten(),
+this.options
+);
+}
+});
+
+Element.CSS_PROPERTIES = $w(
+'backgroundColor backgroundPosition borderBottomColor borderBottomStyle ' +
+'borderBottomWidth borderLeftColor borderLeftStyle borderLeftWidth ' +
+'borderRightColor borderRightStyle borderRightWidth borderSpacing ' +
+'borderTopColor borderTopStyle borderTopWidth bottom clip color ' +
+'fontSize fontWeight height left letterSpacing lineHeight ' +
+'marginBottom marginLeft marginRight marginTop markerOffset maxHeight '+
+'maxWidth minHeight minWidth opacity outlineColor outlineOffset ' +
+'outlineWidth paddingBottom paddingLeft paddingRight paddingTop ' +
+'right textIndent top width wordSpacing zIndex');
+
+Element.CSS_LENGTH = /^(([\+\-]?[0-9\.]+)(em|ex|px|in|cm|mm|pt|pc|\%))|0$/;
+
+String.prototype.parseStyle = function(){
+var element = Element.extend(document.createElement('div'));
+element.innerHTML = '<div style="' + this + '"></div>';
+var style = element.down().style, styleRules = $H();
+
+Element.CSS_PROPERTIES.each(function(property){
+if(style[property]) styleRules[property] = style[property];
+});
+if(/MSIE/.test(navigator.userAgent) && !window.opera && this.indexOf('opacity') > -1) {
+styleRules.opacity = this.match(/opacity:\s*((?:0|1)?(?:\.\d*)?)/)[1];
+}
+return styleRules;
+};
+
+Element.morph = function(element, style) {
+new Effect.Morph(element, Object.extend({ style: style }, arguments[2] || {}));
+return element;
+};
+
+['setOpacity','getOpacity','getInlineOpacity','forceRerendering','setContentZoom',
+'collectTextNodes','collectTextNodesIgnoreClass','morph'].each(
+function(f) { Element.Methods[f] = Element[f]; }
+);
+
+Element.Methods.visualEffect = function(element, effect, options) {
+s = effect.gsub(/_/, '-').camelize();
+effect_class = s.charAt(0).toUpperCase() + s.substring(1);
+new Effect[effect_class](element, options);
+return $(element);
+};
+
+Element.addMethods();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if(typeof Effect == 'undefined')
+throw("controls.js requires including script.aculo.us' effects.js library");
+
+var Autocompleter = {}
+Autocompleter.Base = function() {};
+Autocompleter.Base.prototype = {
+baseInitialize: function(element, update, options) {
+this.element     = $(element);
+this.update      = $(update);
+this.hasFocus    = false;
+this.changed     = false;
+this.active      = false;
+this.index       = 0;
+this.entryCount  = 0;
+
+if(this.setOptions)
+this.setOptions(options);
+else
+this.options = options || {};
+
+this.options.paramName    = this.options.paramName || this.element.name;
+this.options.tokens       = this.options.tokens || [];
+this.options.frequency    = this.options.frequency || 0.4;
+this.options.minChars     = this.options.minChars || 1;
+this.options.onShow       = this.options.onShow ||
+function(element, update){
+if(!update.style.position || update.style.position=='absolute') {
+update.style.position = 'absolute';
+Position.clone(element, update, {
+setHeight: false,
+offsetTop: element.offsetHeight
+});
+}
+Effect.Appear(update,{duration:0.15});
+};
+this.options.onHide = this.options.onHide ||
+function(element, update){ new Effect.Fade(update,{duration:0.15}) };
+
+if(typeof(this.options.tokens) == 'string')
+this.options.tokens = new Array(this.options.tokens);
+
+this.observer = null;
+
+this.element.setAttribute('autocomplete','off');
+
+Element.hide(this.update);
+
+Event.observe(this.element, "blur", this.onBlur.bindAsEventListener(this));
+Event.observe(this.element, "keypress", this.onKeyPress.bindAsEventListener(this));
+},
+
+show: function() {
+if(Element.getStyle(this.update, 'display')=='none') this.options.onShow(this.element, this.update);
+if(!this.iefix &&
+(navigator.appVersion.indexOf('MSIE')>0) &&
+(navigator.userAgent.indexOf('Opera')<0) &&
+(Element.getStyle(this.update, 'position')=='absolute')) {
+new Insertion.After(this.update,
+'<iframe id="' + this.update.id + '_iefix" '+
+'style="display:none;position:absolute;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);" ' +
+'src="javascript:false;" frameborder="0" scrolling="no"></iframe>');
+this.iefix = $(this.update.id+'_iefix');
+}
+if(this.iefix) setTimeout(this.fixIEOverlapping.bind(this), 50);
+},
+
+fixIEOverlapping: function() {
+Position.clone(this.update, this.iefix, {setTop:(!this.update.style.height)});
+this.iefix.style.zIndex = 1;
+this.update.style.zIndex = 2;
+Element.show(this.iefix);
+},
+
+hide: function() {
+this.stopIndicator();
+if(Element.getStyle(this.update, 'display')!='none') this.options.onHide(this.element, this.update);
+if(this.iefix) Element.hide(this.iefix);
+},
+
+startIndicator: function() {
+if(this.options.indicator) Element.show(this.options.indicator);
+},
+
+stopIndicator: function() {
+if(this.options.indicator) Element.hide(this.options.indicator);
+},
+
+onKeyPress: function(event) {
+if(this.active)
+switch(event.keyCode) {
+case Event.KEY_TAB:
+case Event.KEY_RETURN:
+this.selectEntry();
+Event.stop(event);
+case Event.KEY_ESC:
+this.hide();
+this.active = false;
+Event.stop(event);
+return;
+case Event.KEY_LEFT:
+case Event.KEY_RIGHT:
+return;
+case Event.KEY_UP:
+this.markPrevious();
+this.render();
+if(navigator.appVersion.indexOf('AppleWebKit')>0) Event.stop(event);
+return;
+case Event.KEY_DOWN:
+this.markNext();
+this.render();
+if(navigator.appVersion.indexOf('AppleWebKit')>0) Event.stop(event);
+return;
+}
+else
+if(event.keyCode==Event.KEY_TAB || event.keyCode==Event.KEY_RETURN ||
+(navigator.appVersion.indexOf('AppleWebKit') > 0 && event.keyCode == 0)) return;
+
+this.changed = true;
+this.hasFocus = true;
+
+if(this.observer) clearTimeout(this.observer);
+this.observer =
+setTimeout(this.onObserverEvent.bind(this), this.options.frequency*1000);
+},
+
+activate: function() {
+this.changed = false;
+this.hasFocus = true;
+this.getUpdatedChoices();
+},
+
+onHover: function(event) {
+var element = Event.findElement(event, 'LI');
+if(this.index != element.autocompleteIndex)
+{
+this.index = element.autocompleteIndex;
+this.render();
+}
+Event.stop(event);
+},
+
+onClick: function(event) {
+var element = Event.findElement(event, 'LI');
+this.index = element.autocompleteIndex;
+this.selectEntry();
+this.hide();
+},
+
+onBlur: function(event) {
+
+setTimeout(this.hide.bind(this), 250);
+this.hasFocus = false;
+this.active = false;
+},
+
+render: function() {
+if(this.entryCount > 0) {
+for (var i = 0; i < this.entryCount; i++)
+this.index==i ?
+Element.addClassName(this.getEntry(i),"selected") :
+Element.removeClassName(this.getEntry(i),"selected");
+
+if(this.hasFocus) {
+this.show();
+this.active = true;
+}
+} else {
+this.active = false;
+this.hide();
+}
+},
+
+markPrevious: function() {
+if(this.index > 0) this.index--
+else this.index = this.entryCount-1;
+this.getEntry(this.index).scrollIntoView(true);
+},
+
+markNext: function() {
+if(this.index < this.entryCount-1) this.index++
+else this.index = 0;
+this.getEntry(this.index).scrollIntoView(false);
+},
+
+getEntry: function(index) {
+return this.update.firstChild.childNodes[index];
+},
+
+getCurrentEntry: function() {
+return this.getEntry(this.index);
+},
+
+selectEntry: function() {
+this.active = false;
+this.updateElement(this.getCurrentEntry());
+},
+
+updateElement: function(selectedElement) {
+if (this.options.updateElement) {
+this.options.updateElement(selectedElement);
+return;
+}
+var value = '';
+if (this.options.select) {
+var nodes = document.getElementsByClassName(this.options.select, selectedElement) || [];
+if(nodes.length>0) value = Element.collectTextNodes(nodes[0], this.options.select);
+} else
+value = Element.collectTextNodesIgnoreClass(selectedElement, 'informal');
+
+var lastTokenPos = this.findLastToken();
+if (lastTokenPos != -1) {
+var newValue = this.element.value.substr(0, lastTokenPos + 1);
+var whitespace = this.element.value.substr(lastTokenPos + 1).match(/^\s+/);
+if (whitespace)
+newValue += whitespace[0];
+this.element.value = newValue + value;
+} else {
+this.element.value = value;
+}
+this.element.focus();
+
+if (this.options.afterUpdateElement)
+this.options.afterUpdateElement(this.element, selectedElement);
+},
+
+updateChoices: function(choices) {
+if(!this.changed && this.hasFocus) {
+this.update.innerHTML = choices;
+Element.cleanWhitespace(this.update);
+Element.cleanWhitespace(this.update.down());
+
+if(this.update.firstChild && this.update.down().childNodes) {
+this.entryCount =
+this.update.down().childNodes.length;
+for (var i = 0; i < this.entryCount; i++) {
+var entry = this.getEntry(i);
+entry.autocompleteIndex = i;
+this.addObservers(entry);
+}
+} else {
+this.entryCount = 0;
+}
+
+this.stopIndicator();
+this.index = 0;
+
+if(this.entryCount==1 && this.options.autoSelect) {
+this.selectEntry();
+this.hide();
+} else {
+this.render();
+}
+}
+},
+
+addObservers: function(element) {
+Event.observe(element, "mouseover", this.onHover.bindAsEventListener(this));
+Event.observe(element, "click", this.onClick.bindAsEventListener(this));
+},
+
+onObserverEvent: function() {
+this.changed = false;
+if(this.getToken().length>=this.options.minChars) {
+this.startIndicator();
+this.getUpdatedChoices();
+} else {
+this.active = false;
+this.hide();
+}
+},
+
+getToken: function() {
+var tokenPos = this.findLastToken();
+if (tokenPos != -1)
+var ret = this.element.value.substr(tokenPos + 1).replace(/^\s+/,'').replace(/\s+$/,'');
+else
+var ret = this.element.value;
+
+return /\n/.test(ret) ? '' : ret;
+},
+
+findLastToken: function() {
+var lastTokenPos = -1;
+
+for (var i=0; i<this.options.tokens.length; i++) {
+var thisTokenPos = this.element.value.lastIndexOf(this.options.tokens[i]);
+if (thisTokenPos > lastTokenPos)
+lastTokenPos = thisTokenPos;
+}
+return lastTokenPos;
+}
+}
+
+Ajax.Autocompleter = Class.create();
+Object.extend(Object.extend(Ajax.Autocompleter.prototype, Autocompleter.Base.prototype), {
+initialize: function(element, update, url, options) {
+this.baseInitialize(element, update, options);
+this.options.asynchronous  = true;
+this.options.onComplete    = this.onComplete.bind(this);
+this.options.defaultParams = this.options.parameters || null;
+this.url                   = url;
+},
+
+getUpdatedChoices: function() {
+entry = encodeURIComponent(this.options.paramName) + '=' +
+encodeURIComponent(this.getToken());
+
+this.options.parameters = this.options.callback ?
+this.options.callback(this.element, entry) : entry;
+
+if(this.options.defaultParams)
+this.options.parameters += '&' + this.options.defaultParams;
+
+new Ajax.Request(this.url, this.options);
+},
+
+onComplete: function(request) {
+this.updateChoices(request.responseText);
+}
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Autocompleter.Local = Class.create();
+Autocompleter.Local.prototype = Object.extend(new Autocompleter.Base(), {
+initialize: function(element, update, array, options) {
+this.baseInitialize(element, update, options);
+this.options.array = array;
+},
+
+getUpdatedChoices: function() {
+this.updateChoices(this.options.selector(this));
+},
+
+setOptions: function(options) {
+this.options = Object.extend({
+choices: 10,
+partialSearch: true,
+partialChars: 2,
+ignoreCase: true,
+fullSearch: false,
+selector: function(instance) {
+var ret       = []; // Beginning matches
+var partial   = []; // Inside matches
+var entry     = instance.getToken();
+var count     = 0;
+
+for (var i = 0; i < instance.options.array.length &&
+ret.length < instance.options.choices ; i++) {
+
+var elem = instance.options.array[i];
+var foundPos = instance.options.ignoreCase ?
+elem.toLowerCase().indexOf(entry.toLowerCase()) :
+elem.indexOf(entry);
+
+while (foundPos != -1) {
+if (foundPos == 0 && elem.length != entry.length) {
+ret.push("<li><strong>" + elem.substr(0, entry.length) + "</strong>" +
+elem.substr(entry.length) + "</li>");
+break;
+} else if (entry.length >= instance.options.partialChars &&
+instance.options.partialSearch && foundPos != -1) {
+if (instance.options.fullSearch || /\s/.test(elem.substr(foundPos-1,1))) {
+partial.push("<li>" + elem.substr(0, foundPos) + "<strong>" +
+elem.substr(foundPos, entry.length) + "</strong>" + elem.substr(
+foundPos + entry.length) + "</li>");
+break;
+}
+}
+
+foundPos = instance.options.ignoreCase ?
+elem.toLowerCase().indexOf(entry.toLowerCase(), foundPos + 1) :
+elem.indexOf(entry, foundPos + 1);
+
+}
+}
+if (partial.length)
+ret = ret.concat(partial.slice(0, instance.options.choices - ret.length))
+return "<ul>" + ret.join('') + "</ul>";
+}
+}, options || {});
+}
+});
+
+
+
+
+
+
+
+
+Field.scrollFreeActivate = function(field) {
+setTimeout(function() {
+Field.activate(field);
+}, 1);
+}
+
+Ajax.InPlaceEditor = Class.create();
+Ajax.InPlaceEditor.defaultHighlightColor = "#FFFF99";
+Ajax.InPlaceEditor.prototype = {
+initialize: function(element, url, options) {
+this.url = url;
+this.element = $(element);
+
+this.options = Object.extend({
+paramName: "value",
+okButton: true,
+okText: "ok",
+cancelLink: true,
+cancelText: "cancel",
+savingText: "Saving...",
+clickToEditText: "Click to edit",
+okText: "ok",
+rows: 1,
+onComplete: function(transport, element) {
+new Effect.Highlight(element, {startcolor: this.options.highlightcolor});
+},
+onFailure: function(transport) {
+alert("Error communicating with the server: " + transport.responseText.stripTags());
+},
+callback: function(form) {
+return Form.serialize(form);
+},
+handleLineBreaks: true,
+loadingText: 'Loading...',
+savingClassName: 'inplaceeditor-saving',
+loadingClassName: 'inplaceeditor-loading',
+formClassName: 'inplaceeditor-form',
+highlightcolor: Ajax.InPlaceEditor.defaultHighlightColor,
+highlightendcolor: "#FFFFFF",
+externalControl: null,
+submitOnBlur: false,
+ajaxOptions: {},
+evalScripts: false
+}, options || {});
+
+if(!this.options.formId && this.element.id) {
+this.options.formId = this.element.id + "-inplaceeditor";
+if ($(this.options.formId)) {
+
+this.options.formId = null;
+}
+}
+
+if (this.options.externalControl) {
+this.options.externalControl = $(this.options.externalControl);
+}
+
+this.originalBackground = Element.getStyle(this.element, 'background-color');
+if (!this.originalBackground) {
+this.originalBackground = "transparent";
+}
+
+this.element.title = this.options.clickToEditText;
+
+this.onclickListener = this.enterEditMode.bindAsEventListener(this);
+this.mouseoverListener = this.enterHover.bindAsEventListener(this);
+this.mouseoutListener = this.leaveHover.bindAsEventListener(this);
+Event.observe(this.element, 'click', this.onclickListener);
+Event.observe(this.element, 'mouseover', this.mouseoverListener);
+Event.observe(this.element, 'mouseout', this.mouseoutListener);
+if (this.options.externalControl) {
+Event.observe(this.options.externalControl, 'click', this.onclickListener);
+Event.observe(this.options.externalControl, 'mouseover', this.mouseoverListener);
+Event.observe(this.options.externalControl, 'mouseout', this.mouseoutListener);
+}
+},
+enterEditMode: function(evt) {
+if (this.saving) return;
+if (this.editing) return;
+this.editing = true;
+this.onEnterEditMode();
+if (this.options.externalControl) {
+Element.hide(this.options.externalControl);
+}
+Element.hide(this.element);
+this.createForm();
+this.element.parentNode.insertBefore(this.form, this.element);
+if (!this.options.loadTextURL) Field.scrollFreeActivate(this.editField);
+
+if (evt) {
+Event.stop(evt);
+}
+return false;
+},
+createForm: function() {
+this.form = document.createElement("form");
+this.form.id = this.options.formId;
+Element.addClassName(this.form, this.options.formClassName)
+this.form.onsubmit = this.onSubmit.bind(this);
+
+this.createEditField();
+
+if (this.options.textarea) {
+var br = document.createElement("br");
+this.form.appendChild(br);
+}
+
+if (this.options.okButton) {
+okButton = document.createElement("input");
+okButton.type = "submit";
+okButton.value = this.options.okText;
+okButton.className = 'editor_ok_button';
+this.form.appendChild(okButton);
+}
+
+if (this.options.cancelLink) {
+cancelLink = document.createElement("a");
+cancelLink.href = "#";
+cancelLink.appendChild(document.createTextNode(this.options.cancelText));
+cancelLink.onclick = this.onclickCancel.bind(this);
+cancelLink.className = 'editor_cancel';
+this.form.appendChild(cancelLink);
+}
+},
+hasHTMLLineBreaks: function(string) {
+if (!this.options.handleLineBreaks) return false;
+return string.match(/<br/i) || string.match(/<p>/i);
+},
+convertHTMLLineBreaks: function(string) {
+return string.replace(/<br>/gi, "\n").replace(/<br\/>/gi, "\n").replace(/<\/p>/gi, "\n").replace(/<p>/gi, "");
+},
+createEditField: function() {
+var text;
+if(this.options.loadTextURL) {
+text = this.options.loadingText;
+} else {
+text = this.getText();
+}
+
+var obj = this;
+
+if (this.options.rows == 1 && !this.hasHTMLLineBreaks(text)) {
+this.options.textarea = false;
+var textField = document.createElement("input");
+textField.obj = this;
+textField.type = "text";
+textField.name = this.options.paramName;
+textField.value = text;
+textField.style.backgroundColor = this.options.highlightcolor;
+textField.className = 'editor_field';
+var size = this.options.size || this.options.cols || 0;
+if (size != 0) textField.size = size;
+if (this.options.submitOnBlur)
+textField.onblur = this.onSubmit.bind(this);
+this.editField = textField;
+} else {
+this.options.textarea = true;
+var textArea = document.createElement("textarea");
+textArea.obj = this;
+textArea.name = this.options.paramName;
+textArea.value = this.convertHTMLLineBreaks(text);
+textArea.rows = this.options.rows;
+textArea.cols = this.options.cols || 40;
+textArea.className = 'editor_field';
+if (this.options.submitOnBlur)
+textArea.onblur = this.onSubmit.bind(this);
+this.editField = textArea;
+}
+
+if(this.options.loadTextURL) {
+this.loadExternalText();
+}
+this.form.appendChild(this.editField);
+},
+getText: function() {
+return this.element.innerHTML;
+},
+loadExternalText: function() {
+Element.addClassName(this.form, this.options.loadingClassName);
+this.editField.disabled = true;
+new Ajax.Request(
+this.options.loadTextURL,
+Object.extend({
+asynchronous: true,
+onComplete: this.onLoadedExternalText.bind(this)
+}, this.options.ajaxOptions)
+);
+},
+onLoadedExternalText: function(transport) {
+Element.removeClassName(this.form, this.options.loadingClassName);
+this.editField.disabled = false;
+this.editField.value = transport.responseText.stripTags();
+Field.scrollFreeActivate(this.editField);
+},
+onclickCancel: function() {
+this.onComplete();
+this.leaveEditMode();
+return false;
+},
+onFailure: function(transport) {
+this.options.onFailure(transport);
+if (this.oldInnerHTML) {
+this.element.innerHTML = this.oldInnerHTML;
+this.oldInnerHTML = null;
+}
+return false;
+},
+onSubmit: function() {
+
+var form = this.form;
+var value = this.editField.value;
+
+
+
+
+this.onLoading();
+
+if (this.options.evalScripts) {
+new Ajax.Request(
+this.url, Object.extend({
+parameters: this.options.callback(form, value),
+onComplete: this.onComplete.bind(this),
+onFailure: this.onFailure.bind(this),
+asynchronous:true,
+evalScripts:true
+}, this.options.ajaxOptions));
+} else  {
+new Ajax.Updater(
+{ success: this.element,
+
+failure: null },
+this.url, Object.extend({
+parameters: this.options.callback(form, value),
+onComplete: this.onComplete.bind(this),
+onFailure: this.onFailure.bind(this)
+}, this.options.ajaxOptions));
+}
+
+if (arguments.length > 1) {
+Event.stop(arguments[0]);
+}
+return false;
+},
+onLoading: function() {
+this.saving = true;
+this.removeForm();
+this.leaveHover();
+this.showSaving();
+},
+showSaving: function() {
+this.oldInnerHTML = this.element.innerHTML;
+this.element.innerHTML = this.options.savingText;
+Element.addClassName(this.element, this.options.savingClassName);
+this.element.style.backgroundColor = this.originalBackground;
+Element.show(this.element);
+},
+removeForm: function() {
+if(this.form) {
+if (this.form.parentNode) Element.remove(this.form);
+this.form = null;
+}
+},
+enterHover: function() {
+if (this.saving) return;
+this.element.style.backgroundColor = this.options.highlightcolor;
+if (this.effect) {
+this.effect.cancel();
+}
+Element.addClassName(this.element, this.options.hoverClassName)
+},
+leaveHover: function() {
+if (this.options.backgroundColor) {
+this.element.style.backgroundColor = this.oldBackground;
+}
+Element.removeClassName(this.element, this.options.hoverClassName)
+if (this.saving) return;
+this.effect = new Effect.Highlight(this.element, {
+startcolor: this.options.highlightcolor,
+endcolor: this.options.highlightendcolor,
+restorecolor: this.originalBackground
+});
+},
+leaveEditMode: function() {
+Element.removeClassName(this.element, this.options.savingClassName);
+this.removeForm();
+this.leaveHover();
+this.element.style.backgroundColor = this.originalBackground;
+Element.show(this.element);
+if (this.options.externalControl) {
+Element.show(this.options.externalControl);
+}
+this.editing = false;
+this.saving = false;
+this.oldInnerHTML = null;
+this.onLeaveEditMode();
+},
+onComplete: function(transport) {
+this.leaveEditMode();
+this.options.onComplete.bind(this)(transport, this.element);
+},
+onEnterEditMode: function() {},
+onLeaveEditMode: function() {},
+dispose: function() {
+if (this.oldInnerHTML) {
+this.element.innerHTML = this.oldInnerHTML;
+}
+this.leaveEditMode();
+Event.stopObserving(this.element, 'click', this.onclickListener);
+Event.stopObserving(this.element, 'mouseover', this.mouseoverListener);
+Event.stopObserving(this.element, 'mouseout', this.mouseoutListener);
+if (this.options.externalControl) {
+Event.stopObserving(this.options.externalControl, 'click', this.onclickListener);
+Event.stopObserving(this.options.externalControl, 'mouseover', this.mouseoverListener);
+Event.stopObserving(this.options.externalControl, 'mouseout', this.mouseoutListener);
+}
+}
+};
+
+Ajax.InPlaceCollectionEditor = Class.create();
+Object.extend(Ajax.InPlaceCollectionEditor.prototype, Ajax.InPlaceEditor.prototype);
+Object.extend(Ajax.InPlaceCollectionEditor.prototype, {
+createEditField: function() {
+if (!this.cached_selectTag) {
+var selectTag = document.createElement("select");
+var collection = this.options.collection || [];
+var optionTag;
+collection.each(function(e,i) {
+optionTag = document.createElement("option");
+optionTag.value = (e instanceof Array) ? e[0] : e;
+if((typeof this.options.value == 'undefined') &&
+((e instanceof Array) ? this.element.innerHTML == e[1] : e == optionTag.value)) optionTag.selected = true;
+if(this.options.value==optionTag.value) optionTag.selected = true;
+optionTag.appendChild(document.createTextNode((e instanceof Array) ? e[1] : e));
+selectTag.appendChild(optionTag);
+}.bind(this));
+this.cached_selectTag = selectTag;
+}
+
+this.editField = this.cached_selectTag;
+if(this.options.loadTextURL) this.loadExternalText();
+this.form.appendChild(this.editField);
+this.options.callback = function(form, value) {
+return "value=" + encodeURIComponent(value);
+}
+}
+});
+
+
+
+
+
+Form.Element.DelayedObserver = Class.create();
+Form.Element.DelayedObserver.prototype = {
+initialize: function(element, delay, callback) {
+this.delay     = delay || 0.5;
+this.element   = $(element);
+this.callback  = callback;
+this.timer     = null;
+this.lastValue = $F(this.element);
+Event.observe(this.element,'keyup',this.delayedListener.bindAsEventListener(this));
+},
+delayedListener: function(event) {
+if(this.lastValue == $F(this.element)) return;
+if(this.timer) clearTimeout(this.timer);
+this.timer = setTimeout(this.onTimerEvent.bind(this), this.delay * 1000);
+this.lastValue = $F(this.element);
+},
+onTimerEvent: function() {
+this.timer = null;
+this.callback(this.element, $F(this.element));
+}
+};
+
