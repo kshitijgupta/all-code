@@ -22,6 +22,7 @@ int main()
     /* read all words from the standard input
      * - source: all strings until end-of-file (or error)
      * - destination: coll (inserting)
+     *   结束输入Ctrl+D
      */
     copy (istream_iterator<string>(cin),    // start of source
           istream_iterator<string>(),       // end of source
