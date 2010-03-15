@@ -13,3 +13,6 @@ int main() {
 	if (cookie == 0x01020305)
   		printf("you win!\n");
 }
+/*
+ * 同stack1.c
+ */
