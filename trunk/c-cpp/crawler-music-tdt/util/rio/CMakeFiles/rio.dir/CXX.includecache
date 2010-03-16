@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/luolei/crawler-for-music-tdt/util/rio/../.././util/rabinhash-32/rabinhash-c++.h
+
+/home/luolei/crawler-for-music-tdt/util/rio/../../global.h
+sstream
+-
+vector
+-
+./util/rabinhash-32/rabinhash-c++.h
+/home/luolei/crawler-for-music-tdt/util/rio/../.././util/rabinhash-32/rabinhash-c++.h
+
+/home/luolei/crawler-for-music-tdt/util/rio/./rio.h
+unistd.h
+-
+errno.h
+-
+
+/home/luolei/crawler-for-music-tdt/util/rio/rio.cpp
+./rio.h
+/home/luolei/crawler-for-music-tdt/util/rio/./rio.h
+../../global.h
+/home/luolei/crawler-for-music-tdt/util/rio/../../global.h
+iostream
+-
+string.h
+-
+netinet/in.h
+-
+

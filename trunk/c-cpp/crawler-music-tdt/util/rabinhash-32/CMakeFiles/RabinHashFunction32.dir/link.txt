@@ -1,0 +1,2 @@
+/usr/bin/ar cr libRabinHashFunction32.a  CMakeFiles/RabinHashFunction32.dir/rabinhash-c++.cpp.o
+/usr/bin/ranlib libRabinHashFunction32.a
