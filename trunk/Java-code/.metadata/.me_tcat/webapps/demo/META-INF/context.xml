@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Context>
-    <Resource name="jdbc/demo" auth="Container" type="javax.sql.DataSource"
-               maxActive="20" maxIdle="5" maxWait="10000"
-               username="system" 
-               password="manager1" driverClassName="oracle.jdbc.driver.OracleDriver"
-               url="jdbc:oracle:thin:@localhost:1521:icss"/>
- </Context>
-
