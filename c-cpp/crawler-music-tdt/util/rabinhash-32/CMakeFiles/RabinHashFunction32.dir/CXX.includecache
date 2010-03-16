@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/luolei/crawler-for-music-tdt/util/rabinhash-32/rabinhash-c++.cpp
+rabinhash-c++.h
+/home/luolei/crawler-for-music-tdt/util/rabinhash-32/rabinhash-c++.h
+
+/home/luolei/crawler-for-music-tdt/util/rabinhash-32/rabinhash-c++.h
+

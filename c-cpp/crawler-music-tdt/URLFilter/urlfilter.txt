@@ -1,0 +1,4 @@
+^ent.sina.com.cn:80/y/2010.*
+^music.yule.sohu.com:80/2010.*
+^ent.cn.yahoo.com:80/10.*
+^news.xinhuanet.com:80/audio/2010.*
