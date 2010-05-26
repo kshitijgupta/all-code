@@ -40,9 +40,13 @@ _luolei = Person('luolei')
 _luolei.sayHi()
 _luolei.howMany()
 
+print 'hi luolei.population', _luolei.population
 xiaoming = Person('Xiao Ming')
 xiaoming.sayHi()
 xiaoming.howMany()
+xiaoming.population = 199
+print 'hi xiaoming.population', xiaoming.population
+print 'hi luolei.population', _luolei.population
 
 _luolei.sayHi()
 _luolei.howMany()
