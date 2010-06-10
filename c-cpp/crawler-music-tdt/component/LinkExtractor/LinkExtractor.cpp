@@ -168,10 +168,19 @@ bool LinkExtractor::fixURL(struct page_link* plPtr, char* url) {
 			plPtr->_portnumber = pltmp->_portnumber;
 			delete pltmp;
 			return true;
-		} else {//同上
+		} else {
 			strncpy(plPtr->_host_addr, pltmp->_host_addr, 255);
 			plPtr->_host_addr[255] = '\0';
-			strncpy(plPtr->_host_file, urlPtr, 1023);
+                        char* yougang = NULL;
+                        //if(pltmp->_host_file[strlen(pltmp->_host_file)-1] == '/'){
+                        if((yougang = strrchr(pltmp->_host_file, '/')) != NULL){
+                            int length = strlen(pltmp->_host_file) - strlen(yougang);
+                            strncpy(plPtr->_host_file, pltmp->_host_file, length>512?0:length);
+                            strncat(plPtr->_host_file, "/", 1);
+                            strncat(plPtr->_host_file, urlPtr, 511);
+                        }
+                        else
+			    strncpy(plPtr->_host_file, urlPtr, 1023);
 			plPtr ->_host_file[1023] = '\0';
 			plPtr->_portnumber = pltmp->_portnumber;
 			delete pltmp;
