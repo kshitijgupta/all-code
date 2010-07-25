@@ -158,7 +158,7 @@ main(int argc, char** argv)
     mutations.push_back(Mutation());
     mutations.back().column = "entry:foo";
     mutations.back().value = invalid;
-    client.mutateRow(t, "foo", mutations);
+    client.mutateRow(t, "row", mutations);
 
     // try empty strings
     mutations.clear();
@@ -172,17 +172,18 @@ main(int argc, char** argv)
     mutations.push_back(Mutation());
     mutations.back().column = "entry:foo";
     mutations.back().value = valid;
-    client.mutateRow(t, valid, mutations);
+    client.mutateRow(t, "rowrow", mutations);
 
     // non-utf8 is not allowed in row names
+    // 或许以前non-utf8不行，现在的实验是可以
     try {
       mutations.clear();
       mutations.push_back(Mutation());
-      mutations.back().column = "entry:foo";
+      mutations.back().column = "entry:foo-notice";
       mutations.back().value = invalid;
-      client.mutateRow(t, invalid, mutations);
-      std::cout << "FATAL: shouldn't get here!" << std::endl;
-      exit(-1);
+      client.mutateRow(t, "日了", mutations);
+      //std::cout << "FATAL: shouldn't get here!" << std::endl;
+      //exit(-1);
     } catch (IOError e) {
       std::cout << "expected error: " << e.message << std::endl;
     }
@@ -193,16 +194,18 @@ main(int argc, char** argv)
 
     std::cout << "Starting scanner..." << std::endl;
     int scanner = client.scannerOpen(t, "", columnNames);
-    try {
-      while (true) {
-        std::vector<TRowResult> value;
+   // try {
+
+      std::vector<TRowResult> value;
+      do {
         client.scannerGet(value, scanner);
         printRowVector(value);
-      }
-    } catch (...) {
-      client.scannerClose(scanner);
-      std::cout << "Scanner finished" << std::endl;
-    }
+      }while(value.size() != 0);
+    //} catch (...) {
+     // client.scannerClose(scanner);
+      //std::cout << "Scanner finished" << std::endl;
+    //}
+	std::cout << "Scanner finished!" << std::endl;
 
     //
     // Run some operations on a bunch of rows.
@@ -267,8 +270,10 @@ main(int argc, char** argv)
       mutations.back().value = "-999";
       mutations.push_back(Mutation());
       mutations.back().column = "entry:sqr";
+      mutations.back().value  = "-1";
       mutations.back().isDelete = true;
-      client.mutateRowTs(t, row, mutations, 1); // shouldn't override latest
+     // client.mutateRowTs(t, row, mutations, 1); // shouldn't override latest
+      client.mutateRow(t, row, mutations);
       client.getRow(rowResultvector, t, row);
       printRowVector(rowResultvector);
 
@@ -278,14 +283,14 @@ main(int argc, char** argv)
       assert(versions.size() == 4);
       std::cout << std::endl;
 
-      try {
-        std::vector<TCell> valueVec;
-        client.get(valueVec, t, row, "entry:foo");
-        std::cout << "FATAL: shouldn't get here!" << std::endl;
-        exit(-1);
-      } catch (...) {
+//      try {
+ //       std::vector<TCell> valueVec;
+  //      client.get(valueVec, t, row, "entry:foo");
+   //     std::cout << "FATAL: shouldn't get here!" << std::endl;
+    //    exit(-1);
+     // } catch (...) {
         // blank
-      }
+      //}
     }
 
     // scan all rows/columns
@@ -300,11 +305,12 @@ main(int argc, char** argv)
     std::cout << "Starting scanner..." << std::endl;
     scanner = client.scannerOpenWithStop(t, "00020", "00040", columnNames);
     try {
-      while (true) {
-        std::vector<TRowResult> valueVec;
+
+      std::vector<TRowResult> valueVec;
+      do {
         client.scannerGet(valueVec, scanner);
         printRowVector(valueVec);
-      }
+      }while(valueVec.size()!=0);
     } catch (...) {
       client.scannerClose(scanner);
       std::cout << "Scanner finished" << std::endl;
