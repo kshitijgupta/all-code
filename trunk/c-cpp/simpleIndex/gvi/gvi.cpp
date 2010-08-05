@@ -7,8 +7,6 @@
 
 namespace luolei { namespace hit { namespace cir { namespace se { namespace gvi {
 
-    static int MASKS[4] = {0xFF, 0xFFFF, 0xFFFFFF, 0xFFFFFFFF};
-
     void readGVInt(unsigned int* data, const unsigned char* buf){
         unsigned char tags = buf[0];
 
