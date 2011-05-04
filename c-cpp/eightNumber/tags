@@ -1,0 +1,58 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+EightNumber	eightNumber.cpp	/^EightNumber::EightNumber()$/;"	f	class:EightNumber	signature:()
+EightNumber	eightNumber.h	/^        EightNumber();$/;"	p	class:EightNumber	access:public	signature:()
+EightNumber	eightNumber.h	/^class EightNumber$/;"	c
+EightNumber::EightNumber	eightNumber.cpp	/^EightNumber::EightNumber()$/;"	f	class:EightNumber	signature:()
+EightNumber::EightNumber	eightNumber.h	/^        EightNumber();$/;"	p	class:EightNumber	access:public	signature:()
+EightNumber::f	eightNumber.cpp	/^int EightNumber::f(EightNumberNode& e)$/;"	f	class:EightNumber	signature:(EightNumberNode& e)
+EightNumber::f	eightNumber.h	/^        int f(EightNumberNode&);\/\/实际距离$/;"	p	class:EightNumber	access:private	signature:(EightNumberNode&)
+EightNumber::g	eightNumber.cpp	/^int EightNumber::g(EightNumberNode& e)$/;"	f	class:EightNumber	signature:(EightNumberNode& e)
+EightNumber::g	eightNumber.h	/^        int g(EightNumberNode&);\/\/f() + h()$/;"	p	class:EightNumber	access:public	signature:(EightNumberNode&)
+EightNumber::h	eightNumber.cpp	/^int EightNumber::h(EightNumberNode& e)$/;"	f	class:EightNumber	signature:(EightNumberNode& e)
+EightNumber::h	eightNumber.h	/^        int h(EightNumberNode&);\/\/启发距离$/;"	p	class:EightNumber	access:private	signature:(EightNumberNode&)
+EightNumber::lsvec	eightNumber.h	/^        std::vector<LevelState> lsvec;$/;"	m	class:EightNumber	access:private
+EightNumber::say	eightNumber.cpp	/^void EightNumber::say()$/;"	f	class:EightNumber	signature:()
+EightNumber::say	eightNumber.h	/^        void say();\/\/报告当前状态$/;"	p	class:EightNumber	access:private	signature:()
+EightNumber::states	eightNumber.h	/^        int states[9];$/;"	m	class:EightNumber	access:private
+EightNumber::tree_header	eightNumber.h	/^        EightNumberNode* tree_header;$/;"	m	class:EightNumber	access:private
+EightNumber::~EightNumber	eightNumber.cpp	/^EightNumber::~EightNumber()$/;"	f	class:EightNumber	signature:()
+EightNumber::~EightNumber	eightNumber.h	/^        ~EightNumber();$/;"	p	class:EightNumber	access:public	signature:()
+EightNumberNode	eightNumber.h	/^typedef struct EightNumberNode$/;"	s
+EightNumberNode	eightNumber.h	/^}EightNumberNode;$/;"	t	typeref:struct:EightNumberNode
+EightNumberNode::lsptr	eightNumber.h	/^    LevelState* lsptr;$/;"	m	struct:EightNumberNode	access:public
+EightNumberNode::ptrs	eightNumber.h	/^    std::vector<struct EightNumberNode*> ptrs;$/;"	m	struct:EightNumberNode	access:public
+EightNumberNode::value	eightNumber.h	/^    int value;$/;"	m	struct:EightNumberNode	access:public
+LevelState	eightNumber.h	/^    LevelState(int l, int* s)$/;"	f	struct:LevelState	access:public	signature:(int l, int* s)
+LevelState	eightNumber.h	/^typedef struct LevelState$/;"	s
+LevelState	eightNumber.h	/^}LevelState;$/;"	t	typeref:struct:LevelState
+LevelState::LevelState	eightNumber.h	/^    LevelState(int l, int* s)$/;"	f	struct:LevelState	access:public	signature:(int l, int* s)
+LevelState::level	eightNumber.h	/^    int level;$/;"	m	struct:LevelState	access:public
+LevelState::states	eightNumber.h	/^    int states[9];$/;"	m	struct:LevelState	access:public
+_EIGHTNUMBER_H	eightNumber.h	13;"	d
+f	eightNumber.cpp	/^int EightNumber::f(EightNumberNode& e)$/;"	f	class:EightNumber	signature:(EightNumberNode& e)
+f	eightNumber.h	/^        int f(EightNumberNode&);\/\/实际距离$/;"	p	class:EightNumber	access:private	signature:(EightNumberNode&)
+f	tmp.cpp	/^void* f(void * arg)$/;"	f	signature:(void * arg)
+func	tmp.cpp	/^typedef void* (*func)(void*);$/;"	t	file:
+g	eightNumber.cpp	/^int EightNumber::g(EightNumberNode& e)$/;"	f	class:EightNumber	signature:(EightNumberNode& e)
+g	eightNumber.h	/^        int g(EightNumberNode&);\/\/f() + h()$/;"	p	class:EightNumber	access:public	signature:(EightNumberNode&)
+h	eightNumber.cpp	/^int EightNumber::h(EightNumberNode& e)$/;"	f	class:EightNumber	signature:(EightNumberNode& e)
+h	eightNumber.h	/^        int h(EightNumberNode&);\/\/启发距离$/;"	p	class:EightNumber	access:private	signature:(EightNumberNode&)
+level	eightNumber.h	/^    int level;$/;"	m	struct:LevelState	access:public
+lsptr	eightNumber.h	/^    LevelState* lsptr;$/;"	m	struct:EightNumberNode	access:public
+lsvec	eightNumber.h	/^        std::vector<LevelState> lsvec;$/;"	m	class:EightNumber	access:private
+main	main.cpp	/^int main(int args, char** argv)$/;"	f	signature:(int args, char** argv)
+main	tmp.cpp	/^int main(int args, char** argv)$/;"	f	signature:(int args, char** argv)
+ptrs	eightNumber.h	/^    std::vector<struct EightNumberNode*> ptrs;$/;"	m	struct:EightNumberNode	access:public
+say	eightNumber.cpp	/^void EightNumber::say()$/;"	f	class:EightNumber	signature:()
+say	eightNumber.h	/^        void say();\/\/报告当前状态$/;"	p	class:EightNumber	access:private	signature:()
+states	eightNumber.h	/^        int states[9];$/;"	m	class:EightNumber	access:private
+states	eightNumber.h	/^    int states[9];$/;"	m	struct:LevelState	access:public
+tree_header	eightNumber.h	/^        EightNumberNode* tree_header;$/;"	m	class:EightNumber	access:private
+value	eightNumber.h	/^    int value;$/;"	m	struct:EightNumberNode	access:public
+~EightNumber	eightNumber.cpp	/^EightNumber::~EightNumber()$/;"	f	class:EightNumber	signature:()
+~EightNumber	eightNumber.h	/^        ~EightNumber();$/;"	p	class:EightNumber	access:public	signature:()
